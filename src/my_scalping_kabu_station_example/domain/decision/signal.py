@@ -1,0 +1,39 @@
+"""Trading signal and intent definitions."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Dict, Optional
+
+
+class OrderSide(str, Enum):
+    BUY = "BUY"
+    SELL = "SELL"
+
+
+@dataclass(frozen=True)
+class InferenceResult:
+    """Output of model inference."""
+
+    features: Dict[str, float]
+    score: float
+    raw: Optional[Any] = None
+
+
+@dataclass(frozen=True)
+class TradeIntent:
+    """Domain representation of a trading intent."""
+
+    intent_id: str
+    side: OrderSide
+    quantity: float
+    metadata: Optional[Dict[str, Any]] = None
+
+
+@dataclass(frozen=True)
+class DecisionContext:
+    """Context for decision making."""
+
+    position_size: float
+    risk_budget: float
