@@ -7,11 +7,16 @@ from my_scalping_kabu_station_example.domain.features import names
 from my_scalping_kabu_station_example.domain.features.expr import (
     Add,
     AddSum,
+    BestAskPrice,
+    BestAskQty,
+    BestBidPrice,
+    BestBidQty,
     Const,
     DepletionSum,
     DepthQtySum,
     Div,
     MicroPrice,
+    Mid,
     Sub,
     TimeDecayEma,
 )
@@ -94,3 +99,37 @@ def test_compute_batch_iterates_snapshots() -> None:
 
     assert len(features) == 2
     assert features[0][names.DEPLETION_IMBALANCE] == 0.0  # prev is None
+
+
+def test_compute_one_exposes_best_levels_and_mid() -> None:
+    engine = PandasOrderBookFeatureEngine()
+    ts = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    snapshot = _make_snapshot(
+        ts,
+        bids=[("100.0", 2.0), ("99.8", 1.0)],
+        asks=[("100.5", 1.0), ("101.0", 1.5)],
+    )
+    spec = FeatureSpec.from_features(
+        version="ob10_v1",
+        eps=1e-9,
+        params={},
+        features=[
+            FeatureDef("best_bid_price", expr=BestBidPrice()),
+            FeatureDef("best_ask_price", expr=BestAskPrice()),
+            FeatureDef("best_bid_qty", expr=BestBidQty()),
+            FeatureDef("best_ask_qty", expr=BestAskQty()),
+            FeatureDef("mid_price", expr=Mid()),
+            FeatureDef(names.MICROPRICE_SHIFT, expr=Sub(MicroPrice(eps=1e-9), Mid())),
+        ],
+    )
+
+    features, state = engine.compute_one(spec, None, snapshot, FeatureState())
+
+    assert features["best_bid_price"] == pytest.approx(100.0)
+    assert features["best_ask_price"] == pytest.approx(100.5)
+    assert features["best_bid_qty"] == pytest.approx(2.0)
+    assert features["best_ask_qty"] == pytest.approx(1.0)
+    assert features["mid_price"] == pytest.approx(100.25)
+    expected_micro = (100.5 * 2.0 + 100.0 * 1.0) / (2.0 + 1.0 + 1e-9)
+    assert features[names.MICROPRICE_SHIFT] == pytest.approx(expected_micro - 100.25)
+    assert state.last_ts == snapshot.ts

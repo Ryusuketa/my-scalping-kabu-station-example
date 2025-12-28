@@ -79,6 +79,36 @@ class MicroPrice(Expr):
 
 
 @dataclass(frozen=True)
+class BestBidPrice(Expr):
+    def describe(self) -> str:
+        return "BestBidPrice()"
+
+
+@dataclass(frozen=True)
+class BestAskPrice(Expr):
+    def describe(self) -> str:
+        return "BestAskPrice()"
+
+
+@dataclass(frozen=True)
+class BestBidQty(Expr):
+    def describe(self) -> str:
+        return "BestBidQty()"
+
+
+@dataclass(frozen=True)
+class BestAskQty(Expr):
+    def describe(self) -> str:
+        return "BestAskQty()"
+
+
+@dataclass(frozen=True)
+class Mid(Expr):
+    def describe(self) -> str:
+        return "Mid()"
+
+
+@dataclass(frozen=True)
 class DepletionSum(Expr):
     side: Side
 

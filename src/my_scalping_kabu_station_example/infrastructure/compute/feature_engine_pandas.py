@@ -10,6 +10,10 @@ from ...application.ports.feature_engine import FeatureEnginePort, FeatureTable,
 from ...application.service.state.feature_state import FeatureState
 from ...domain.features.expr import (
     Add,
+    BestAskPrice,
+    BestAskQty,
+    BestBidPrice,
+    BestBidQty,
     AddSum,
     BinaryExpr,
     Const,
@@ -18,6 +22,7 @@ from ...domain.features.expr import (
     Diff,
     Div,
     Expr,
+    Mid,
     MicroPrice,
     Mul,
     Sub,
@@ -87,6 +92,16 @@ class PandasOrderBookFeatureEngine(FeatureEnginePort):
     ) -> Tuple[float, FeatureState]:
         if isinstance(expr, Const):
             return float(expr.value), state
+        if isinstance(expr, BestBidPrice):
+            return _price_to_float(now_snapshot.best_bid_price), state
+        if isinstance(expr, BestAskPrice):
+            return _price_to_float(now_snapshot.best_ask_price), state
+        if isinstance(expr, BestBidQty):
+            return _qty_to_float(now_snapshot.best_bid_qty), state
+        if isinstance(expr, BestAskQty):
+            return _qty_to_float(now_snapshot.best_ask_qty), state
+        if isinstance(expr, Mid):
+            return _price_to_float(now_snapshot.mid), state
         if isinstance(expr, BinaryExpr):
             left, state = self._eval_expr(feature_name, expr.left, prev_snapshot, now_snapshot, state, eps)
             right, state = self._eval_expr(feature_name, expr.right, prev_snapshot, now_snapshot, state, eps)
