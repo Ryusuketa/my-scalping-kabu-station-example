@@ -1,0 +1,10 @@
+"""Canonical feature names."""
+
+OBI_5 = "obi_5"
+MICROPRICE = "microprice"
+MICROPRICE_SHIFT = "microprice_shift"
+DEPLETION_IMBALANCE = "depletion_imbalance"
+ADD_IMBALANCE = "add_imbalance"
+DEPLETION_IMBALANCE_EMA = "depletion_imbalance_ema"
+ADD_IMBALANCE_EMA = "add_imbalance_ema"
+OBI_5_EMA = "obi_5_ema"
