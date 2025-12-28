@@ -31,6 +31,7 @@ class TradeIntent:
     quantity: float
     symbol: Symbol
     price: float
+    cash_margin: int
     metadata: Optional[Dict[str, Any]] = None
 
 
@@ -42,3 +43,7 @@ class DecisionContext:
     risk_budget: float
     symbol: Symbol
     price: float
+    has_open_order: bool = False
+    open_order_side: OrderSide | None = None
+    open_order_price: float | None = None
+    open_order_qty: int | None = None

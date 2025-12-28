@@ -12,10 +12,10 @@ def test_to_order_payload_includes_intent_fields() -> None:
         quantity=5.0,
         symbol=Symbol("1234"),
         price=0,
+        cash_margin=2,
         metadata={
             "Exchange": 1,
             "SecurityType": 1,
-            "CashMargin": 1,
             "DelivType": 0,
             "AccountType": 2,
             "ExpireDay": 0,
@@ -29,6 +29,7 @@ def test_to_order_payload_includes_intent_fields() -> None:
     assert payload["Price"] == 0
     assert payload["Side"] == "2"
     assert payload["Qty"] == 500
+    assert payload["CashMargin"] == 2
 
 
 def test_build_order_payload_applies_side_override() -> None:
@@ -38,10 +39,10 @@ def test_build_order_payload_applies_side_override() -> None:
         quantity=1.0,
         symbol=Symbol("1234"),
         price=0,
+        cash_margin=2,
         metadata={
             "Exchange": 1,
             "SecurityType": 1,
-            "CashMargin": 1,
             "DelivType": 0,
             "AccountType": 2,
             "ExpireDay": 0,
@@ -54,10 +55,18 @@ def test_build_order_payload_applies_side_override() -> None:
     assert payload["Symbol"] == Symbol("1234")
     assert payload["Price"] == 0
     assert payload["Side"] == "2"
+    assert payload["CashMargin"] == 2
 
 
 def test_to_order_payload_requires_fields() -> None:
-    intent = TradeIntent(intent_id="abc", side=OrderSide.SELL, quantity=1.0, symbol=Symbol("1234"), price=0.0)
+    intent = TradeIntent(
+        intent_id="abc",
+        side=OrderSide.SELL,
+        quantity=1.0,
+        symbol=Symbol("1234"),
+        price=0.0,
+        cash_margin=2,
+    )
 
     with pytest.raises(ValueError):
         to_order_payload(intent)

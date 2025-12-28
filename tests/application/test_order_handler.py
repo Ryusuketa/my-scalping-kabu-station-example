@@ -17,7 +17,14 @@ class DummyBrokerClient:
 
 def test_order_handler_marks_filled() -> None:
     store = InMemoryOrderStore()
-    order = RealTimeOrder(symbol=Symbol("TEST"), qty=100, side=OrderSide.BUY, cash_margin=2, order_id="o1")
+    order = RealTimeOrder(
+        symbol=Symbol("TEST"),
+        qty=100,
+        side=OrderSide.BUY,
+        cash_margin=2,
+        order_id="o1",
+        price=100.0,
+    )
     store.add(order)
     broker = DummyBrokerClient(
         {
@@ -33,7 +40,14 @@ def test_order_handler_marks_filled() -> None:
 
 def test_order_handler_removes_repayment_orders() -> None:
     store = InMemoryOrderStore()
-    order = RealTimeOrder(symbol=Symbol("TEST"), qty=100, side=OrderSide.SELL, cash_margin=3, order_id="o2")
+    order = RealTimeOrder(
+        symbol=Symbol("TEST"),
+        qty=100,
+        side=OrderSide.SELL,
+        cash_margin=3,
+        order_id="o2",
+        price=100.0,
+    )
     store.add(order)
     broker = DummyBrokerClient(
         {

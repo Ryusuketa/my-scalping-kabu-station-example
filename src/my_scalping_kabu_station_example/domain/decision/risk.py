@@ -11,3 +11,4 @@ class RiskParams:
     stop_loss: float
     take_profit: float
     cooldown_seconds: float = 0.0
+    loss_cut_pips: float = 0.0

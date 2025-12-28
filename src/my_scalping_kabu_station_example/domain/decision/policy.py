@@ -24,6 +24,10 @@ class DecisionPolicy:
         * otherwise: no trade
         """
 
+        loss_cut = self._loss_cut_intent(context, risk)
+        if loss_cut is not None:
+            return loss_cut
+
         score = inference.score
         if score > self.score_threshold:
             qty = self._buy_quantity(context.position_size, risk.max_position)
@@ -35,6 +39,7 @@ class DecisionPolicy:
                 quantity=qty,
                 symbol=context.symbol,
                 price=context.price,
+                cash_margin=2,
             )
 
         if score < -self.score_threshold:
@@ -47,6 +52,7 @@ class DecisionPolicy:
                 quantity=qty,
                 symbol=context.symbol,
                 price=context.price,
+                cash_margin=2,
             )
 
         return None
@@ -62,6 +68,32 @@ class DecisionPolicy:
         if available <= 0:
             return 0.0
         return min(self.lot_size, available)
+
+    def _loss_cut_intent(self, context: DecisionContext, risk: RiskParams) -> TradeIntent | None:
+        if not context.has_open_order or risk.loss_cut_pips <= 0:
+            return None
+        if context.open_order_price is None or context.open_order_side is None or context.open_order_qty is None:
+            return None
+
+        if context.open_order_side is OrderSide.BUY:
+            loss_pips = context.open_order_price - context.price
+            repay_side = OrderSide.SELL
+        else:
+            loss_pips = context.price - context.open_order_price
+            repay_side = OrderSide.BUY
+
+        if loss_pips < risk.loss_cut_pips:
+            return None
+
+        quantity_units = context.open_order_qty / 100.0
+        return TradeIntent(
+            intent_id=self._intent_id(),
+            side=repay_side,
+            quantity=quantity_units,
+            symbol=context.symbol,
+            price=context.price,
+            cash_margin=3,
+        )
 
     @staticmethod
     def _intent_id() -> str:

@@ -15,6 +15,7 @@ def test_decision_policy_triggers_buy_within_limits() -> None:
     assert intent is not None
     assert intent.side is OrderSide.BUY
     assert intent.quantity == 1.0
+    assert intent.cash_margin == 2
 
 
 def test_decision_policy_respects_position_cap() -> None:
@@ -39,6 +40,7 @@ def test_decision_policy_handles_sell_and_fractional_quantity() -> None:
     assert intent is not None
     assert intent.side is OrderSide.SELL
     assert intent.quantity == 0.5
+    assert intent.cash_margin == 2
 
 
 def test_decision_policy_ignores_small_scores() -> None:
@@ -50,3 +52,26 @@ def test_decision_policy_ignores_small_scores() -> None:
     intent = policy.decide(inference, context, risk)
 
     assert intent is None
+
+
+def test_decision_policy_triggers_loss_cut() -> None:
+    policy = DecisionPolicy(score_threshold=0.9, lot_size=1.0)
+    risk = RiskParams(max_position=1.0, stop_loss=1.0, take_profit=1.0, loss_cut_pips=1.0)
+    context = DecisionContext(
+        position_size=0.0,
+        risk_budget=risk.max_position,
+        symbol=Symbol("TEST"),
+        price=99.0,
+        has_open_order=True,
+        open_order_side=OrderSide.BUY,
+        open_order_price=100.5,
+        open_order_qty=200,
+    )
+    inference = InferenceResult(features={}, score=0.0)
+
+    intent = policy.decide(inference, context, risk)
+
+    assert intent is not None
+    assert intent.cash_margin == 3
+    assert intent.side is OrderSide.SELL
+    assert intent.quantity == 2.0

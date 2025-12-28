@@ -6,7 +6,7 @@ from my_scalping_kabu_station_example.application.ports.buffer import MarketBuff
 from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureEnginePort
 from my_scalping_kabu_station_example.application.ports.history import HistoryStorePort
 from my_scalping_kabu_station_example.application.ports.model import ModelStorePort
-from my_scalping_kabu_station_example.application.ports.broker import OrderPort, PositionPort
+from my_scalping_kabu_station_example.application.ports.broker import OrderPort, OrderStatePort, PositionPort
 from my_scalping_kabu_station_example.application.ports.market_data import MarketDataSourcePort
 from my_scalping_kabu_station_example.domain.decision.policy import DecisionPolicy
 from my_scalping_kabu_station_example.domain.decision.risk import RiskParams
@@ -25,6 +25,7 @@ class InferencePipeline:
         model_store: ModelStorePort,
         order_port: OrderPort,
         position_port: PositionPort,
+        order_state: OrderStatePort | None = None,
         feature_spec: FeatureSpec,
         decision_policy: DecisionPolicy,
         risk_params: RiskParams,
@@ -36,6 +37,7 @@ class InferencePipeline:
         self.model_store = model_store
         self.order_port = order_port
         self.position_port = position_port
+        self.order_state = order_state
         self.feature_spec = feature_spec
         self.decision_policy = decision_policy
         self.risk_params = risk_params
@@ -66,11 +68,20 @@ class InferencePipeline:
 
         inference = predictor.predict(features)
 
+        open_order = None
+        if self.order_state is not None:
+            orders = list(self.order_state.list())
+            open_order = orders[0] if orders else None
+
         context = DecisionContext(
             position_size=self.position_port.current_position(),
             risk_budget=self.risk_params.max_position,
             symbol=snapshot.symbol,
             price=float(snapshot.mid or 0.0),
+            has_open_order=open_order is not None,
+            open_order_side=open_order.side if open_order else None,
+            open_order_price=open_order.price if open_order else None,
+            open_order_qty=open_order.qty if open_order else None,
         )
         intent = self.decision_policy.decide(inference=inference, context=context, risk=self.risk_params)
         if intent is not None:

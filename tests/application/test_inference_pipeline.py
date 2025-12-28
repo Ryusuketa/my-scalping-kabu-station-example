@@ -149,7 +149,14 @@ def test_inference_pipeline_runs_full_flow() -> None:
     model_store = DummyModelStore(predictor)
     order_port = DummyOrderPort()
     position_port = DummyPositionPort(position=0.5)
-    intent = TradeIntent(intent_id="abc", side=OrderSide.BUY, quantity=1.0, symbol=Symbol("TEST"), price=0.0)
+    intent = TradeIntent(
+        intent_id="abc",
+        side=OrderSide.BUY,
+        quantity=1.0,
+        symbol=Symbol("TEST"),
+        price=0.0,
+        cash_margin=2,
+    )
     decision_policy = DummyDecisionPolicy(intent=intent)
     feature_spec = FeatureSpec(version="v1", eps=1e-9, params={}, features=[FeatureDef(name="x", expr=Const(1.0))])
     risk_params = RiskParams(max_position=2.0, stop_loss=1.0, take_profit=1.0)

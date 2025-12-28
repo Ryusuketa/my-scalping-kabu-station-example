@@ -15,4 +15,5 @@ class RealTimeOrder:
     side: OrderSide
     cash_margin: int
     order_id: str
+    price: float
     is_filled: bool = False

@@ -59,12 +59,14 @@ class KabuOrderPort:
 
             cash_margin = int(payload["CashMargin"])
             qty = int(payload["Qty"])
+            price = float(payload["Price"])
             order = RealTimeOrder(
                 symbol=intent.symbol,
                 qty=qty,
                 side=side_override or intent.side,
                 cash_margin=cash_margin,
                 order_id=order_id,
+                price=price,
             )
             self.order_store.add(order)
         return order_id

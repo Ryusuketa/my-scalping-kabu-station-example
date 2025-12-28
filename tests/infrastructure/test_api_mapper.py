@@ -4,7 +4,14 @@ from my_scalping_kabu_station_example.infrastructure.api.mapper import to_api
 
 
 def test_to_api_maps_trade_intent() -> None:
-    intent = TradeIntent(intent_id="abc", side=OrderSide.BUY, quantity=1.5, symbol=Symbol("TEST"), price=0.0)
+    intent = TradeIntent(
+        intent_id="abc",
+        side=OrderSide.BUY,
+        quantity=1.5,
+        symbol=Symbol("TEST"),
+        price=0.0,
+        cash_margin=2,
+    )
 
     dto = to_api(intent)
 

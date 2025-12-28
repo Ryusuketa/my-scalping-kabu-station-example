@@ -32,13 +32,12 @@ def build_order_payload(
     payload.update(intent.metadata or {})
     if "symbol" in payload and "Symbol" not in payload:
         payload["Symbol"] = payload["symbol"]
-    if intent.symbol is not None:
-        payload["Symbol"] = intent.symbol
-    if intent.price is not None:
-        payload["Price"] = intent.price
+    payload["Symbol"] = intent.symbol
+    payload["Price"] = intent.price
     side_value = side_override or intent.side
     payload["Side"] = "2" if side_value is OrderSide.BUY else "1"
     payload["Qty"] = int(intent.quantity * 100)
+    payload["CashMargin"] = int(intent.cash_margin)
 
     required = {
         "Symbol",
