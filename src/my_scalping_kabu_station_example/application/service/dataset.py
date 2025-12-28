@@ -5,14 +5,20 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Iterable, List
 
-from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureEnginePort
+from my_scalping_kabu_station_example.application.ports.feature_engine import (
+    FeatureEnginePort,
+)
 from my_scalping_kabu_station_example.application.ports.history import HistoryStorePort
 from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
 
 
 class DatasetBuilder:
-    def __init__(self, history_store: HistoryStorePort, feature_engine: FeatureEnginePort) -> None:
+    def __init__(
+        self, history_store: HistoryStorePort, feature_engine: FeatureEnginePort
+    ) -> None:
         self.history_store = history_store
         self.feature_engine = feature_engine
 

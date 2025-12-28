@@ -1,5 +1,9 @@
-from my_scalping_kabu_station_example.application.usecase.on_market_data import OnMarketDataUseCase
-from my_scalping_kabu_station_example.application.usecase.on_startup import OnStartupUseCase
+from my_scalping_kabu_station_example.application.usecase.on_market_data import (
+    OnMarketDataUseCase,
+)
+from my_scalping_kabu_station_example.application.usecase.on_startup import (
+    OnStartupUseCase,
+)
 
 
 class DummyInferencePipeline:

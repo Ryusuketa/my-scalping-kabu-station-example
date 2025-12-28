@@ -6,19 +6,33 @@ from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Iterable
 
-from my_scalping_kabu_station_example.application.service.pipelines.training_pipeline import TrainingPipeline
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
-from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
-from my_scalping_kabu_station_example.infrastructure.config.settings import load_settings
+from my_scalping_kabu_station_example.application.service.pipelines.training_pipeline import (
+    TrainingPipeline,
+)
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
+from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import (
+    PandasOrderBookFeatureEngine,
+)
+from my_scalping_kabu_station_example.infrastructure.config.settings import (
+    load_settings,
+)
 from my_scalping_kabu_station_example.infrastructure.ml.xgb_trainer import XgbTrainer
-from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
-from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import ModelStoreFs
+from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import (
+    CsvHistoryStore,
+)
+from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import (
+    ModelStoreFs,
+)
 
 
 def train_models_from_history(asof: datetime | None = None) -> None:
     settings = load_settings()
     history_store = CsvHistoryStore(path=settings.history_path)
-    training_day = _select_training_day(history_store, asof or datetime.now(timezone.utc))
+    training_day = _select_training_day(
+        history_store, asof or datetime.now(timezone.utc)
+    )
     if training_day is None:
         return
 
@@ -50,8 +64,12 @@ def _select_training_day(history_store: CsvHistoryStore, asof: datetime) -> date
     if not available:
         return None
 
-    asof_utc = asof.astimezone(timezone.utc) if asof.tzinfo else asof.replace(tzinfo=timezone.utc)
-    prev_day = (asof_utc.date() - timedelta(days=1))
+    asof_utc = (
+        asof.astimezone(timezone.utc)
+        if asof.tzinfo
+        else asof.replace(tzinfo=timezone.utc)
+    )
+    prev_day = asof_utc.date() - timedelta(days=1)
     if prev_day in available:
         return prev_day
     return max(available)

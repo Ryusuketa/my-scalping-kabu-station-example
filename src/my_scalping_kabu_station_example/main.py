@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from my_scalping_kabu_station_example.infrastructure.main.training_bootstrap import train_models_from_history
+from my_scalping_kabu_station_example.infrastructure.main.training_bootstrap import (
+    train_models_from_history,
+)
 
 
 def main() -> None:

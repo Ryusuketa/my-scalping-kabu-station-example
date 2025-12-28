@@ -3,17 +3,29 @@
 from __future__ import annotations
 
 from my_scalping_kabu_station_example.application.ports.buffer import MarketBufferPort
-from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureEnginePort
+from my_scalping_kabu_station_example.application.ports.feature_engine import (
+    FeatureEnginePort,
+)
 from my_scalping_kabu_station_example.application.ports.history import HistoryStorePort
 from my_scalping_kabu_station_example.application.ports.model import ModelStorePort
-from my_scalping_kabu_station_example.application.ports.broker import OrderPort, OrderStatePort, PositionPort
-from my_scalping_kabu_station_example.application.ports.market_data import MarketDataSourcePort
+from my_scalping_kabu_station_example.application.ports.broker import (
+    OrderPort,
+    OrderStatePort,
+    PositionPort,
+)
+from my_scalping_kabu_station_example.application.ports.market_data import (
+    MarketDataSourcePort,
+)
 from my_scalping_kabu_station_example.domain.decision.policy import DecisionPolicy
 from my_scalping_kabu_station_example.domain.decision.risk import RiskParams
 from my_scalping_kabu_station_example.domain.decision.signal import DecisionContext
 from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
-from my_scalping_kabu_station_example.application.service.state.stream_state import StreamState
-from my_scalping_kabu_station_example.application.service.order_handler import OrderHandler
+from my_scalping_kabu_station_example.application.service.state.stream_state import (
+    StreamState,
+)
+from my_scalping_kabu_station_example.application.service.order_handler import (
+    OrderHandler,
+)
 
 
 class InferencePipeline:
@@ -79,7 +91,11 @@ class InferencePipeline:
 
         open_order = None
         if self.order_state is not None:
-            orders = [order for order in self.order_state.list() if order.symbol == snapshot.symbol]
+            orders = [
+                order
+                for order in self.order_state.list()
+                if order.symbol == snapshot.symbol
+            ]
             open_order = orders[0] if orders else None
 
         best_bid = snapshot.best_bid_price
@@ -101,7 +117,9 @@ class InferencePipeline:
             open_order_price=open_order.price if open_order else None,
             open_order_qty=open_order.qty if open_order else None,
         )
-        intent = self.decision_policy.decide(inference=inference, context=context, risk=self.risk_params)
+        intent = self.decision_policy.decide(
+            inference=inference, context=context, risk=self.risk_params
+        )
         if intent is not None:
             self.order_port.place_order(intent)
 

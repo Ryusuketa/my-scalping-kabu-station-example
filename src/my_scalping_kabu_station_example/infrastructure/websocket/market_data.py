@@ -7,9 +7,15 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from my_scalping_kabu_station_example.application.ports.market_data import MarketDataSourcePort
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
-from my_scalping_kabu_station_example.infrastructure.websocket.client import WebSocketClient
+from my_scalping_kabu_station_example.application.ports.market_data import (
+    MarketDataSourcePort,
+)
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
+from my_scalping_kabu_station_example.infrastructure.websocket.client import (
+    WebSocketClient,
+)
 from my_scalping_kabu_station_example.infrastructure.websocket.dto import OrderBookDto
 from my_scalping_kabu_station_example.infrastructure.websocket.mapper import to_domain
 

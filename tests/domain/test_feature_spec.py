@@ -1,8 +1,14 @@
 import pytest
 
 from my_scalping_kabu_station_example.domain.features import names
-from my_scalping_kabu_station_example.domain.features.expr import DepthQtySum, MicroPrice
-from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
+from my_scalping_kabu_station_example.domain.features.expr import (
+    DepthQtySum,
+    MicroPrice,
+)
+from my_scalping_kabu_station_example.domain.features.spec import (
+    FeatureDef,
+    FeatureSpec,
+)
 from my_scalping_kabu_station_example.domain.market.types import Side
 
 

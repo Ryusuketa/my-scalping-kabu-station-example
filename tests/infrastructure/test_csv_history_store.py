@@ -1,10 +1,18 @@
 from datetime import datetime, timedelta, timezone
 
 from my_scalping_kabu_station_example.domain.market.level import Level
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
 from my_scalping_kabu_station_example.domain.market.time import Timestamp
-from my_scalping_kabu_station_example.domain.market.types import Quantity, Symbol, price_key_from
-from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
+from my_scalping_kabu_station_example.domain.market.types import (
+    Quantity,
+    Symbol,
+    price_key_from,
+)
+from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import (
+    CsvHistoryStore,
+)
 
 
 def _make_snapshot(ts: datetime, bid_price: str, ask_price: str) -> OrderBookSnapshot:

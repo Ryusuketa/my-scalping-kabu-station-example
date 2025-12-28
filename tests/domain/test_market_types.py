@@ -2,7 +2,10 @@ from decimal import Decimal
 
 import pytest
 
-from my_scalping_kabu_station_example.domain.market.types import PriceKey, price_key_from
+from my_scalping_kabu_station_example.domain.market.types import (
+    PriceKey,
+    price_key_from,
+)
 
 
 def test_price_key_from_converts_float_without_binary_artifacts() -> None:

@@ -5,9 +5,15 @@ from __future__ import annotations
 from datetime import datetime
 
 from my_scalping_kabu_station_example.domain.market.level import Level
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
 from my_scalping_kabu_station_example.domain.market.time import Timestamp
-from my_scalping_kabu_station_example.domain.market.types import Quantity, Symbol, price_key_from
+from my_scalping_kabu_station_example.domain.market.types import (
+    Quantity,
+    Symbol,
+    price_key_from,
+)
 from my_scalping_kabu_station_example.infrastructure.websocket.dto import OrderBookDto
 
 

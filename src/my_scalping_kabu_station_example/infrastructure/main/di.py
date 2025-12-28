@@ -4,12 +4,24 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
-from my_scalping_kabu_station_example.infrastructure.config.settings import load_settings
-from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
-from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import ModelStoreFs
-from my_scalping_kabu_station_example.infrastructure.websocket.client import WebSocketClient
-from my_scalping_kabu_station_example.infrastructure.websocket.market_data import WebSocketMarketDataSource
+from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import (
+    PandasOrderBookFeatureEngine,
+)
+from my_scalping_kabu_station_example.infrastructure.config.settings import (
+    load_settings,
+)
+from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import (
+    CsvHistoryStore,
+)
+from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import (
+    ModelStoreFs,
+)
+from my_scalping_kabu_station_example.infrastructure.websocket.client import (
+    WebSocketClient,
+)
+from my_scalping_kabu_station_example.infrastructure.websocket.market_data import (
+    WebSocketMarketDataSource,
+)
 
 
 def build_container() -> dict:

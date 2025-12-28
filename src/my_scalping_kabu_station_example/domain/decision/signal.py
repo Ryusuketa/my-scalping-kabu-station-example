@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 
 from my_scalping_kabu_station_example.domain.market.types import Symbol
 
+
 class OrderSide(str, Enum):
     BUY = "BUY"
     SELL = "SELL"

@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
-from my_scalping_kabu_station_example.application.service.pipelines.inference_pipeline import InferencePipeline
-from my_scalping_kabu_station_example.application.service.state.stream_state import StreamState
+from my_scalping_kabu_station_example.application.service.pipelines.inference_pipeline import (
+    InferencePipeline,
+)
+from my_scalping_kabu_station_example.application.service.state.stream_state import (
+    StreamState,
+)
 
 
 class OnMarketDataUseCase:

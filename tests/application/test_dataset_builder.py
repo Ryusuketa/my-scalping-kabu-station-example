@@ -4,13 +4,26 @@ import pytest
 
 from my_scalping_kabu_station_example.application.service.dataset import DatasetBuilder
 from my_scalping_kabu_station_example.domain.features.expr import MicroPrice
-from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
+from my_scalping_kabu_station_example.domain.features.spec import (
+    FeatureDef,
+    FeatureSpec,
+)
 from my_scalping_kabu_station_example.domain.market.level import Level
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
 from my_scalping_kabu_station_example.domain.market.time import Timestamp
-from my_scalping_kabu_station_example.domain.market.types import Quantity, Symbol, price_key_from
-from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
-from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
+from my_scalping_kabu_station_example.domain.market.types import (
+    Quantity,
+    Symbol,
+    price_key_from,
+)
+from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import (
+    PandasOrderBookFeatureEngine,
+)
+from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import (
+    CsvHistoryStore,
+)
 
 
 def _make_snapshot(ts: datetime, bid: str, ask: str) -> OrderBookSnapshot:
@@ -34,7 +47,10 @@ def test_dataset_builder_collects_features(tmp_path) -> None:
     builder = DatasetBuilder(history_store=history_store, feature_engine=feature_engine)
     ts0 = datetime(2024, 1, 1, tzinfo=timezone.utc)
     ts1 = datetime(2024, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
-    snapshots = [_make_snapshot(ts0, "100.0", "100.5"), _make_snapshot(ts1, "100.1", "100.6")]
+    snapshots = [
+        _make_snapshot(ts0, "100.0", "100.5"),
+        _make_snapshot(ts1, "100.1", "100.6"),
+    ]
 
     features = builder.build(spec, snapshots)
 

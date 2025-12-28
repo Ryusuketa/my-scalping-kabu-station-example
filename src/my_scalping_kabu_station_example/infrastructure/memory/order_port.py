@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from my_scalping_kabu_station_example.application.ports.broker import OrderPort, OrderStatePort
+from my_scalping_kabu_station_example.application.ports.broker import (
+    OrderPort,
+    OrderStatePort,
+)
 from my_scalping_kabu_station_example.domain.decision.signal import TradeIntent
 from my_scalping_kabu_station_example.domain.order.realtime_order import RealTimeOrder
 

@@ -6,7 +6,10 @@ import pickle
 from dataclasses import dataclass
 from pathlib import Path
 
-from my_scalping_kabu_station_example.application.ports.model import ModelPredictorPort, ModelStorePort
+from my_scalping_kabu_station_example.application.ports.model import (
+    ModelPredictorPort,
+    ModelStorePort,
+)
 from my_scalping_kabu_station_example.domain.market.types import Symbol
 
 

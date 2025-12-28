@@ -1,8 +1,14 @@
 import pytest
 
-from my_scalping_kabu_station_example.domain.decision.signal import OrderSide, TradeIntent
+from my_scalping_kabu_station_example.domain.decision.signal import (
+    OrderSide,
+    TradeIntent,
+)
 from my_scalping_kabu_station_example.domain.market.types import Symbol
-from my_scalping_kabu_station_example.infrastructure.api.mapper import build_order_payload, to_order_payload
+from my_scalping_kabu_station_example.infrastructure.api.mapper import (
+    build_order_payload,
+    to_order_payload,
+)
 
 
 def test_to_order_payload_includes_intent_fields() -> None:

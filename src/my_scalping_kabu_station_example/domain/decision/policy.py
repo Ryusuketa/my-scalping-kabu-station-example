@@ -5,7 +5,11 @@ from __future__ import annotations
 from uuid import uuid4
 
 from my_scalping_kabu_station_example.domain.decision.risk import RiskParams
-from my_scalping_kabu_station_example.domain.decision.signal import DecisionContext, InferenceResult, TradeIntent
+from my_scalping_kabu_station_example.domain.decision.signal import (
+    DecisionContext,
+    InferenceResult,
+    TradeIntent,
+)
 from my_scalping_kabu_station_example.domain.decision.signal import OrderSide
 
 
@@ -16,7 +20,9 @@ class DecisionPolicy:
         self.score_threshold = score_threshold
         self.lot_size = lot_size
 
-    def decide(self, inference: InferenceResult, context: DecisionContext, risk: RiskParams) -> TradeIntent | None:
+    def decide(
+        self, inference: InferenceResult, context: DecisionContext, risk: RiskParams
+    ) -> TradeIntent | None:
         """Simple threshold-based decision rule with position caps.
 
         * score > threshold -> buy up to max_position
@@ -69,10 +75,16 @@ class DecisionPolicy:
             return 0.0
         return min(self.lot_size, available)
 
-    def _exit_intent(self, context: DecisionContext, risk: RiskParams) -> TradeIntent | None:
+    def _exit_intent(
+        self, context: DecisionContext, risk: RiskParams
+    ) -> TradeIntent | None:
         if not context.has_open_order:
             return None
-        if context.open_order_price is None or context.open_order_side is None or context.open_order_qty is None:
+        if (
+            context.open_order_price is None
+            or context.open_order_side is None
+            or context.open_order_qty is None
+        ):
             return None
 
         pip_size = context.pip_size if context.pip_size > 0 else 1.0
@@ -91,7 +103,9 @@ class DecisionPolicy:
             return None
 
         quantity_units = context.open_order_qty / 100.0
-        metadata = {"FrontOrderType": 10} if (loss_triggered or gain_triggered) else None
+        metadata = (
+            {"FrontOrderType": 10} if (loss_triggered or gain_triggered) else None
+        )
         price = 0.0 if (loss_triggered or gain_triggered) else context.price
         return TradeIntent(
             intent_id=self._intent_id(),

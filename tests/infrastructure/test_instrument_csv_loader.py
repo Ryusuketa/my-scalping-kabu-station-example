@@ -1,4 +1,6 @@
-from my_scalping_kabu_station_example.infrastructure.persistence.instrument_csv_loader import load_instruments
+from my_scalping_kabu_station_example.infrastructure.persistence.instrument_csv_loader import (
+    load_instruments,
+)
 
 
 def test_load_instruments_reads_symbols_and_metadata(tmp_path) -> None:

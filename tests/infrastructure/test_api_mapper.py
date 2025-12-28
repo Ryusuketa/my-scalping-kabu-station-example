@@ -1,4 +1,7 @@
-from my_scalping_kabu_station_example.domain.decision.signal import OrderSide, TradeIntent
+from my_scalping_kabu_station_example.domain.decision.signal import (
+    OrderSide,
+    TradeIntent,
+)
 from my_scalping_kabu_station_example.domain.market.types import Symbol
 from my_scalping_kabu_station_example.infrastructure.api.mapper import to_api
 

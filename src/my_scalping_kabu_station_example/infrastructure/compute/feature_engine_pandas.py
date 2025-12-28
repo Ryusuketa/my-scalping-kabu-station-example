@@ -3,13 +3,17 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from decimal import Decimal
-from typing import Dict, Iterable, List, Tuple
+from typing import Iterable, Tuple
 
-from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureEnginePort, FeatureTable, FeatureVector
-from my_scalping_kabu_station_example.application.service.state.feature_state import FeatureState
+from my_scalping_kabu_station_example.application.ports.feature_engine import (
+    FeatureEnginePort,
+    FeatureTable,
+    FeatureVector,
+)
+from my_scalping_kabu_station_example.application.service.state.feature_state import (
+    FeatureState,
+)
 from my_scalping_kabu_station_example.domain.features.expr import (
-    Add,
     BestAskPrice,
     BestAskQty,
     BestBidPrice,
@@ -19,19 +23,21 @@ from my_scalping_kabu_station_example.domain.features.expr import (
     Const,
     DepletionSum,
     DepthQtySum,
-    Diff,
-    Div,
     Expr,
     Mid,
     MicroPrice,
-    Mul,
-    Sub,
     TimeDecayEma,
 )
-from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
 from my_scalping_kabu_station_example.domain.market.time import TimeDecay
-from my_scalping_kabu_station_example.domain.market.types import PriceKey, Quantity, Side
+from my_scalping_kabu_station_example.domain.market.types import (
+    PriceKey,
+    Quantity,
+    Side,
+)
 
 
 def _qty_to_float(qty: Quantity | None) -> float:
@@ -67,7 +73,9 @@ class PandasOrderBookFeatureEngine(FeatureEnginePort):
         current_state.last_ts = now_snapshot.ts
         return features, current_state
 
-    def compute_batch(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]) -> FeatureTable:
+    def compute_batch(
+        self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]
+    ) -> FeatureTable:
         state = FeatureState()
         for prev, now in self._pairwise_snapshots(snapshots):
             features, state = self.compute_one(spec, prev, now, state)
@@ -103,8 +111,12 @@ class PandasOrderBookFeatureEngine(FeatureEnginePort):
         if isinstance(expr, Mid):
             return _price_to_float(now_snapshot.mid), state
         if isinstance(expr, BinaryExpr):
-            left, state = self._eval_expr(feature_name, expr.left, prev_snapshot, now_snapshot, state, eps)
-            right, state = self._eval_expr(feature_name, expr.right, prev_snapshot, now_snapshot, state, eps)
+            left, state = self._eval_expr(
+                feature_name, expr.left, prev_snapshot, now_snapshot, state, eps
+            )
+            right, state = self._eval_expr(
+                feature_name, expr.right, prev_snapshot, now_snapshot, state, eps
+            )
             if expr.op in {"+", "add"}:
                 return left + right, state
             if expr.op in {"-", "sub", "diff"}:
@@ -128,18 +140,26 @@ class PandasOrderBookFeatureEngine(FeatureEnginePort):
             micro = (ask_p * bid_q + bid_p * ask_q) / denom
             return micro, state
         if isinstance(expr, DepletionSum):
-            return self._calc_delta_sum(prev_snapshot, now_snapshot, expr.side, mode="depletion"), state
+            return self._calc_delta_sum(
+                prev_snapshot, now_snapshot, expr.side, mode="depletion"
+            ), state
         if isinstance(expr, AddSum):
-            return self._calc_delta_sum(prev_snapshot, now_snapshot, expr.side, mode="add"), state
+            return self._calc_delta_sum(
+                prev_snapshot, now_snapshot, expr.side, mode="add"
+            ), state
         if isinstance(expr, TimeDecayEma):
-            source_value, state = self._eval_expr(feature_name, expr.source, prev_snapshot, now_snapshot, state, eps)
+            source_value, state = self._eval_expr(
+                feature_name, expr.source, prev_snapshot, now_snapshot, state, eps
+            )
             last_ts = state.last_ts or now_snapshot.ts
             decay = TimeDecay(expr.tau_seconds)
             delta_t = (now_snapshot.ts - last_ts).total_seconds()
             alpha = decay.alpha(delta_t)
             prev_ema = state.ema_values.get(feature_name, source_value)
             ema = prev_ema + alpha * (source_value - prev_ema)
-            new_state = replace(state, ema_values={**state.ema_values, feature_name: ema})
+            new_state = replace(
+                state, ema_values={**state.ema_values, feature_name: ema}
+            )
             return ema, new_state
         raise ValueError(f"Unsupported expression type: {expr}")
 

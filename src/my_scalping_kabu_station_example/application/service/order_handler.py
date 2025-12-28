@@ -6,8 +6,9 @@ from dataclasses import dataclass
 from typing import Iterable, Mapping
 
 from my_scalping_kabu_station_example.application.ports.broker import OrderStatePort
-from my_scalping_kabu_station_example.domain.order.realtime_order import RealTimeOrder
-from my_scalping_kabu_station_example.infrastructure.api.broker_client import BrokerClient
+from my_scalping_kabu_station_example.infrastructure.api.broker_client import (
+    BrokerClient,
+)
 
 
 @dataclass

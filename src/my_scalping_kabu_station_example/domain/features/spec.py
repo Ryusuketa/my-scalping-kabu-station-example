@@ -39,6 +39,12 @@ class FeatureSpec:
 
     @classmethod
     def from_features(
-        cls, version: str, eps: float, features: Iterable[FeatureDef], params: Optional[Dict[str, object]] = None
+        cls,
+        version: str,
+        eps: float,
+        features: Iterable[FeatureDef],
+        params: Optional[Dict[str, object]] = None,
     ) -> "FeatureSpec":
-        return cls(version=version, eps=eps, params=params or {}, features=list(features))
+        return cls(
+            version=version, eps=eps, params=params or {}, features=list(features)
+        )

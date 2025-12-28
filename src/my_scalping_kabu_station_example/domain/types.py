@@ -45,8 +45,7 @@ class Timestamped:
 class PriceLevelIterable(Protocol):
     """Protocol for level iterables used across domain methods."""
 
-    def __iter__(self) -> Iterable:
-        ...
+    def __iter__(self) -> Iterable: ...
 
 
 PriceQtyMap = Dict[PriceKey, float]

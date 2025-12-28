@@ -25,7 +25,11 @@ from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
 from my_scalping_kabu_station_example.domain.features.state import FeatureState
 from my_scalping_kabu_station_example.domain.order_book import OrderBookSnapshot
 from my_scalping_kabu_station_example.domain.ports import FeatureEnginePort
-from my_scalping_kabu_station_example.domain.types import PriceQtyMap, Side, to_price_key
+from my_scalping_kabu_station_example.domain.types import (
+    PriceQtyMap,
+    Side,
+    to_price_key,
+)
 from my_scalping_kabu_station_example.domain.order_book import Level
 
 
@@ -50,45 +54,98 @@ class PandasOrderBookFeatureEngine(FeatureEnginePort):
 
             value: float
             if isinstance(expr, BestBidPrice):
-                value = float(now_snapshot.best_bid_price) if now_snapshot.best_bid_price is not None else float("nan")
+                value = (
+                    float(now_snapshot.best_bid_price)
+                    if now_snapshot.best_bid_price is not None
+                    else float("nan")
+                )
             elif isinstance(expr, BestAskPrice):
-                value = float(now_snapshot.best_ask_price) if now_snapshot.best_ask_price is not None else float("nan")
+                value = (
+                    float(now_snapshot.best_ask_price)
+                    if now_snapshot.best_ask_price is not None
+                    else float("nan")
+                )
             elif isinstance(expr, BestBidQty):
-                value = now_snapshot.best_bid_qty if now_snapshot.best_bid_qty is not None else float("nan")
+                value = (
+                    now_snapshot.best_bid_qty
+                    if now_snapshot.best_bid_qty is not None
+                    else float("nan")
+                )
             elif isinstance(expr, BestAskQty):
-                value = now_snapshot.best_ask_qty if now_snapshot.best_ask_qty is not None else float("nan")
+                value = (
+                    now_snapshot.best_ask_qty
+                    if now_snapshot.best_ask_qty is not None
+                    else float("nan")
+                )
             elif isinstance(expr, Mid):
-                value = float(now_snapshot.mid) if now_snapshot.mid is not None else float("nan")
+                value = (
+                    float(now_snapshot.mid)
+                    if now_snapshot.mid is not None
+                    else float("nan")
+                )
             elif isinstance(expr, DepthQtySum):
-                levels = now_snapshot.bid_levels if expr.side == Side.BID else now_snapshot.ask_levels
+                levels = (
+                    now_snapshot.bid_levels
+                    if expr.side == Side.BID
+                    else now_snapshot.ask_levels
+                )
                 value = float(sum(level.quantity for level in levels[: expr.depth]))
             elif isinstance(expr, DepletionSum):
-                value = self._quantity_diff_sum(prev_snapshot, now_snapshot, expr.side, mode="depletion")
+                value = self._quantity_diff_sum(
+                    prev_snapshot, now_snapshot, expr.side, mode="depletion"
+                )
             elif isinstance(expr, AddSum):
-                value = self._quantity_diff_sum(prev_snapshot, now_snapshot, expr.side, mode="add")
+                value = self._quantity_diff_sum(
+                    prev_snapshot, now_snapshot, expr.side, mode="add"
+                )
             elif isinstance(expr, Imbalance):
                 numerator = eval_expr(expr.numerator)
                 denominator = eval_expr(expr.denominator)
                 value = (numerator - denominator) / (numerator + denominator + expr.eps)
             elif isinstance(expr, MicroPrice):
-                best_ask_price = float(now_snapshot.best_ask_price) if now_snapshot.best_ask_price is not None else float("nan")
-                best_bid_price = float(now_snapshot.best_bid_price) if now_snapshot.best_bid_price is not None else float("nan")
-                best_bid_qty = now_snapshot.best_bid_qty if now_snapshot.best_bid_qty is not None else float("nan")
-                best_ask_qty = now_snapshot.best_ask_qty if now_snapshot.best_ask_qty is not None else float("nan")
-                value = (best_ask_price * best_bid_qty + best_bid_price * best_ask_qty) / (
-                    best_bid_qty + best_ask_qty + expr.eps
+                best_ask_price = (
+                    float(now_snapshot.best_ask_price)
+                    if now_snapshot.best_ask_price is not None
+                    else float("nan")
                 )
+                best_bid_price = (
+                    float(now_snapshot.best_bid_price)
+                    if now_snapshot.best_bid_price is not None
+                    else float("nan")
+                )
+                best_bid_qty = (
+                    now_snapshot.best_bid_qty
+                    if now_snapshot.best_bid_qty is not None
+                    else float("nan")
+                )
+                best_ask_qty = (
+                    now_snapshot.best_ask_qty
+                    if now_snapshot.best_ask_qty is not None
+                    else float("nan")
+                )
+                value = (
+                    best_ask_price * best_bid_qty + best_bid_price * best_ask_qty
+                ) / (best_bid_qty + best_ask_qty + expr.eps)
             elif isinstance(expr, Diff):
                 value = eval_expr(expr.left) - eval_expr(expr.right)
             elif isinstance(expr, TimeDecayEma):
                 target_value = eval_expr(expr.target)
-                key = feature_name or expr.name or getattr(expr.target, "name", None) or "ema"
+                key = (
+                    feature_name
+                    or expr.name
+                    or getattr(expr.target, "name", None)
+                    or "ema"
+                )
                 prev_ema = ema_store.get(key, target_value)
                 if prev_ts is None:
                     ema_value = target_value
                 else:
                     delta = (now_snapshot.ts - prev_ts).total_seconds()
-                    alpha = 1 - exp(-delta / expr.tau_seconds) if expr.tau_seconds > 0 else 1.0
+                    alpha = (
+                        1 - exp(-delta / expr.tau_seconds)
+                        if expr.tau_seconds > 0
+                        else 1.0
+                    )
                     ema_value = prev_ema + alpha * (target_value - prev_ema)
                 ema_store[key] = ema_value
                 value = ema_value
@@ -104,7 +161,9 @@ class PandasOrderBookFeatureEngine(FeatureEnginePort):
         new_state = FeatureState(last_ts=now_snapshot.ts, ema_values=ema_store)
         return results, new_state
 
-    def compute_batch(self, spec: FeatureSpec, snapshots_df: pd.DataFrame) -> pd.DataFrame:
+    def compute_batch(
+        self, spec: FeatureSpec, snapshots_df: pd.DataFrame
+    ) -> pd.DataFrame:
         features: list[Dict[str, float]] = []
         state = FeatureState()
         prev_snapshot: OrderBookSnapshot | None = None
@@ -119,12 +178,19 @@ class PandasOrderBookFeatureEngine(FeatureEnginePort):
 
     @staticmethod
     def _quantity_diff_sum(
-        prev_snapshot: OrderBookSnapshot | None, now_snapshot: OrderBookSnapshot, side: Side, mode: str
+        prev_snapshot: OrderBookSnapshot | None,
+        now_snapshot: OrderBookSnapshot,
+        side: Side,
+        mode: str,
     ) -> float:
         prev_map: PriceQtyMap = (
-            prev_snapshot.bid_map if side == Side.BID else prev_snapshot.ask_map
-        ) if prev_snapshot is not None else {}
-        now_map: PriceQtyMap = now_snapshot.bid_map if side == Side.BID else now_snapshot.ask_map
+            (prev_snapshot.bid_map if side == Side.BID else prev_snapshot.ask_map)
+            if prev_snapshot is not None
+            else {}
+        )
+        now_map: PriceQtyMap = (
+            now_snapshot.bid_map if side == Side.BID else now_snapshot.ask_map
+        )
         keys = set(prev_map.keys()) | set(now_map.keys())
 
         total = 0.0
@@ -147,7 +213,9 @@ class PandasOrderBookFeatureEngine(FeatureEnginePort):
         ask_levels = PandasOrderBookFeatureEngine._levels_from_row(row, prefix="ask")
         ts = pd.to_datetime(row["ts"]).to_pydatetime()
         symbol = row["symbol"]
-        return OrderBookSnapshot.from_levels(ts=ts, symbol=symbol, bid_levels=bid_levels, ask_levels=ask_levels)
+        return OrderBookSnapshot.from_levels(
+            ts=ts, symbol=symbol, bid_levels=bid_levels, ask_levels=ask_levels
+        )
 
     @staticmethod
     def _levels_from_row(row: pd.Series, prefix: str) -> Iterable[Level]:

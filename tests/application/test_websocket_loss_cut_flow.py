@@ -1,23 +1,50 @@
 import json
 from datetime import datetime, timezone
 
-from my_scalping_kabu_station_example.application.service.order_handler import OrderHandler
-from my_scalping_kabu_station_example.application.service.pipelines.inference_pipeline import InferencePipeline
-from my_scalping_kabu_station_example.application.service.state.stream_state import StreamState
+from my_scalping_kabu_station_example.application.service.order_handler import (
+    OrderHandler,
+)
+from my_scalping_kabu_station_example.application.service.pipelines.inference_pipeline import (
+    InferencePipeline,
+)
+from my_scalping_kabu_station_example.application.service.state.stream_state import (
+    StreamState,
+)
 from my_scalping_kabu_station_example.domain.decision.policy import DecisionPolicy
 from my_scalping_kabu_station_example.domain.decision.risk import RiskParams
 from my_scalping_kabu_station_example.domain.features.expr import MicroPrice
-from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
-from my_scalping_kabu_station_example.infrastructure.api.broker_client import KabuOrderPort
-from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
-from my_scalping_kabu_station_example.infrastructure.memory.order_store import InMemoryOrderStore
-from my_scalping_kabu_station_example.infrastructure.memory.position_port import InMemoryPositionPort
-from my_scalping_kabu_station_example.infrastructure.memory.ring_buffer import InMemoryMarketBuffer
-from my_scalping_kabu_station_example.infrastructure.ml.xgb_predictor import XgbPredictor
-from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
-from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import ModelStoreFs
+from my_scalping_kabu_station_example.domain.features.spec import (
+    FeatureDef,
+    FeatureSpec,
+)
+from my_scalping_kabu_station_example.infrastructure.api.broker_client import (
+    KabuOrderPort,
+)
+from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import (
+    PandasOrderBookFeatureEngine,
+)
+from my_scalping_kabu_station_example.infrastructure.memory.order_store import (
+    InMemoryOrderStore,
+)
+from my_scalping_kabu_station_example.infrastructure.memory.position_port import (
+    InMemoryPositionPort,
+)
+from my_scalping_kabu_station_example.infrastructure.memory.ring_buffer import (
+    InMemoryMarketBuffer,
+)
+from my_scalping_kabu_station_example.infrastructure.ml.xgb_predictor import (
+    XgbPredictor,
+)
+from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import (
+    CsvHistoryStore,
+)
+from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import (
+    ModelStoreFs,
+)
 from tests.helpers.mock_ws_client import MockWebSocketClient
-from my_scalping_kabu_station_example.infrastructure.websocket.market_data import WebSocketMarketDataSource
+from my_scalping_kabu_station_example.infrastructure.websocket.market_data import (
+    WebSocketMarketDataSource,
+)
 
 
 class DummyBrokerClient:
@@ -53,7 +80,9 @@ def test_websocket_flow_places_loss_cut_after_fill(tmp_path) -> None:
         _ws_message(ts0, "TEST", 100.0, 100.5),
         _ws_message(ts1, "TEST", 98.0, 98.5),
     ]
-    market_data = WebSocketMarketDataSource(client=MockWebSocketClient(messages=messages))
+    market_data = WebSocketMarketDataSource(
+        client=MockWebSocketClient(messages=messages)
+    )
     market_data.subscribe()
 
     order_store = InMemoryOrderStore()
@@ -71,8 +100,12 @@ def test_websocket_flow_places_loss_cut_after_fill(tmp_path) -> None:
         },
         order_store=order_store,
     )
-    order_handler = OrderHandler(order_store=order_store, broker_client=broker_client, api_key="token")
-    predictor = XgbPredictor(feature_order=["microprice"], model=None, default_score=1.0)
+    order_handler = OrderHandler(
+        order_store=order_store, broker_client=broker_client, api_key="token"
+    )
+    predictor = XgbPredictor(
+        feature_order=["microprice"], model=None, default_score=1.0
+    )
     model_store = ModelStoreFs(base_dir=tmp_path / "models")
     model_store.save_candidate(predictor)
     model_store.swap_active(predictor)
@@ -83,7 +116,9 @@ def test_websocket_flow_places_loss_cut_after_fill(tmp_path) -> None:
         features=[FeatureDef("microprice", MicroPrice(eps=1e-9))],
     )
     policy = DecisionPolicy(score_threshold=0.5, lot_size=1.0)
-    risk = RiskParams(max_position=1.0, stop_loss=1.0, take_profit=0.0, loss_cut_pips=1.0)
+    risk = RiskParams(
+        max_position=1.0, stop_loss=1.0, take_profit=0.0, loss_cut_pips=1.0
+    )
 
     pipeline = InferencePipeline(
         market_data=market_data,

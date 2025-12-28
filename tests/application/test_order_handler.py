@@ -1,8 +1,12 @@
-from my_scalping_kabu_station_example.application.service.order_handler import OrderHandler
+from my_scalping_kabu_station_example.application.service.order_handler import (
+    OrderHandler,
+)
 from my_scalping_kabu_station_example.domain.decision.signal import OrderSide
 from my_scalping_kabu_station_example.domain.market.types import Symbol
 from my_scalping_kabu_station_example.domain.order.realtime_order import RealTimeOrder
-from my_scalping_kabu_station_example.infrastructure.memory.order_store import InMemoryOrderStore
+from my_scalping_kabu_station_example.infrastructure.memory.order_store import (
+    InMemoryOrderStore,
+)
 
 
 class DummyBrokerClient:

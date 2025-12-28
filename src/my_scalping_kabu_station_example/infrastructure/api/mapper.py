@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, Mapping
 
-from my_scalping_kabu_station_example.domain.decision.signal import OrderSide, TradeIntent
-from my_scalping_kabu_station_example.domain.market.types import Symbol
+from my_scalping_kabu_station_example.domain.decision.signal import (
+    OrderSide,
+    TradeIntent,
+)
 from my_scalping_kabu_station_example.infrastructure.api.dto import OrderRequestDto
 
 

@@ -4,15 +4,14 @@ from __future__ import annotations
 
 from typing import Iterable, Protocol
 
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
 
 
 class MarketBufferPort(Protocol):
-    def update(self, snapshot: OrderBookSnapshot) -> None:
-        ...
+    def update(self, snapshot: OrderBookSnapshot) -> None: ...
 
-    def get_prev(self) -> OrderBookSnapshot | None:
-        ...
+    def get_prev(self) -> OrderBookSnapshot | None: ...
 
-    def get_window(self, size: int) -> Iterable[OrderBookSnapshot]:
-        ...
+    def get_window(self, size: int) -> Iterable[OrderBookSnapshot]: ...

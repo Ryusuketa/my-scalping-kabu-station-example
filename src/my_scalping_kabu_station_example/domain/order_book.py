@@ -6,7 +6,11 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Iterable, List, Optional, Sequence, Tuple
 
-from my_scalping_kabu_station_example.domain.types import PriceKey, PriceQtyMap, Side, to_price_key
+from my_scalping_kabu_station_example.domain.types import (
+    PriceKey,
+    PriceQtyMap,
+    to_price_key,
+)
 
 
 @dataclass(frozen=True)
@@ -82,8 +86,12 @@ class OrderBookUpdate:
 
     def to_snapshot(self) -> OrderBookSnapshot:
         """Normalize the raw update into an OrderBookSnapshot."""
-        bid_levels = [Level(price=to_price_key(price), quantity=qty) for price, qty in self.bids]
-        ask_levels = [Level(price=to_price_key(price), quantity=qty) for price, qty in self.asks]
+        bid_levels = [
+            Level(price=to_price_key(price), quantity=qty) for price, qty in self.bids
+        ]
+        ask_levels = [
+            Level(price=to_price_key(price), quantity=qty) for price, qty in self.asks
+        ]
         return OrderBookSnapshot.from_levels(
             ts=self.ts,
             symbol=self.symbol,

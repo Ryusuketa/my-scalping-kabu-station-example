@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Protocol, Tuple
+from typing import Protocol
 
 import pandas as pd
 
@@ -24,7 +24,9 @@ class FeatureEnginePort(Protocol):
         """Compute feature vector for a single event."""
         ...
 
-    def compute_batch(self, spec: FeatureSpec, snapshots_df: pd.DataFrame) -> pd.DataFrame:
+    def compute_batch(
+        self, spec: FeatureSpec, snapshots_df: pd.DataFrame
+    ) -> pd.DataFrame:
         """Compute features for an entire dataframe of snapshots."""
         ...
 

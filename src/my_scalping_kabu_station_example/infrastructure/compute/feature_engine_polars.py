@@ -4,11 +4,21 @@ from __future__ import annotations
 
 from typing import Iterable, Tuple
 
-from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureEnginePort, FeatureTable, FeatureVector
-from my_scalping_kabu_station_example.application.service.state.feature_state import FeatureState
+from my_scalping_kabu_station_example.application.ports.feature_engine import (
+    FeatureEnginePort,
+    FeatureTable,
+    FeatureVector,
+)
+from my_scalping_kabu_station_example.application.service.state.feature_state import (
+    FeatureState,
+)
 from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
-from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
+from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import (
+    PandasOrderBookFeatureEngine,
+)
 
 
 class PolarsOrderBookFeatureEngine(FeatureEnginePort):
@@ -26,5 +36,7 @@ class PolarsOrderBookFeatureEngine(FeatureEnginePort):
     ) -> Tuple[FeatureVector, FeatureState]:
         return self._fallback.compute_one(spec, prev_snapshot, now_snapshot, state)
 
-    def compute_batch(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]) -> FeatureTable:
+    def compute_batch(
+        self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]
+    ) -> FeatureTable:
         return self._fallback.compute_batch(spec, snapshots)

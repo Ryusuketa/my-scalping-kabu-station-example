@@ -6,7 +6,9 @@ from collections import deque
 from typing import Iterable, Optional
 
 from my_scalping_kabu_station_example.application.ports.buffer import MarketBufferPort
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
 
 
 class RingBuffer:

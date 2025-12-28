@@ -4,12 +4,19 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureEnginePort
+from my_scalping_kabu_station_example.application.ports.feature_engine import (
+    FeatureEnginePort,
+)
 from my_scalping_kabu_station_example.application.ports.history import HistoryStorePort
-from my_scalping_kabu_station_example.application.ports.model import ModelStorePort, ModelTrainerPort
+from my_scalping_kabu_station_example.application.ports.model import (
+    ModelStorePort,
+    ModelTrainerPort,
+)
 from my_scalping_kabu_station_example.application.service.dataset import DatasetBuilder
 from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
 
 
 class TrainingPipeline:
@@ -30,7 +37,9 @@ class TrainingPipeline:
     def run(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]) -> None:
         """Train a model from snapshots and activate the resulting predictor."""
 
-        builder = DatasetBuilder(history_store=self.history_store, feature_engine=self.feature_engine)
+        builder = DatasetBuilder(
+            history_store=self.history_store, feature_engine=self.feature_engine
+        )
         dataset = builder.build_with_labels(
             spec=spec,
             snapshots=snapshots,

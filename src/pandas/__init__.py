@@ -78,9 +78,13 @@ class DataFrame:
 
 class _Testing:
     @staticmethod
-    def assert_frame_equal(left: DataFrame, right: DataFrame, rtol: float = 1e-9, atol: float = 0.0) -> None:
+    def assert_frame_equal(
+        left: DataFrame, right: DataFrame, rtol: float = 1e-9, atol: float = 0.0
+    ) -> None:
         if len(left) != len(right):
-            raise AssertionError(f"DataFrame length mismatch: {len(left)} != {len(right)}")
+            raise AssertionError(
+                f"DataFrame length mismatch: {len(left)} != {len(right)}"
+            )
 
         left_rows = left.to_dicts()
         right_rows = right.to_dicts()
@@ -94,10 +98,14 @@ class _Testing:
                     continue
                 if isinstance(lv, (int, float)) and isinstance(rv, (int, float)):
                     if not math.isclose(lv, rv, rel_tol=rtol, abs_tol=atol):
-                        raise AssertionError(f"Row {idx} column {key} mismatch: {lv} != {rv}")
+                        raise AssertionError(
+                            f"Row {idx} column {key} mismatch: {lv} != {rv}"
+                        )
                 else:
                     if lv != rv:
-                        raise AssertionError(f"Row {idx} column {key} mismatch: {lv} != {rv}")
+                        raise AssertionError(
+                            f"Row {idx} column {key} mismatch: {lv} != {rv}"
+                        )
 
 
 testing = _Testing()

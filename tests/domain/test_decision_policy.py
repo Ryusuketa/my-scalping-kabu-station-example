@@ -1,6 +1,10 @@
 from my_scalping_kabu_station_example.domain.decision.policy import DecisionPolicy
 from my_scalping_kabu_station_example.domain.decision.risk import RiskParams
-from my_scalping_kabu_station_example.domain.decision.signal import DecisionContext, InferenceResult, OrderSide
+from my_scalping_kabu_station_example.domain.decision.signal import (
+    DecisionContext,
+    InferenceResult,
+    OrderSide,
+)
 from my_scalping_kabu_station_example.domain.market.types import Symbol
 
 
@@ -80,7 +84,9 @@ def test_decision_policy_ignores_small_scores() -> None:
 
 def test_decision_policy_triggers_loss_cut_for_buy() -> None:
     policy = DecisionPolicy(score_threshold=0.9, lot_size=1.0)
-    risk = RiskParams(max_position=1.0, stop_loss=1.0, take_profit=1.0, loss_cut_pips=1.0)
+    risk = RiskParams(
+        max_position=1.0, stop_loss=1.0, take_profit=1.0, loss_cut_pips=1.0
+    )
     context = DecisionContext(
         position_size=0.0,
         risk_budget=risk.max_position,
@@ -105,7 +111,9 @@ def test_decision_policy_triggers_loss_cut_for_buy() -> None:
 
 def test_decision_policy_triggers_take_profit_for_buy() -> None:
     policy = DecisionPolicy(score_threshold=0.9, lot_size=1.0)
-    risk = RiskParams(max_position=1.0, stop_loss=1.0, take_profit=2.0, loss_cut_pips=5.0)
+    risk = RiskParams(
+        max_position=1.0, stop_loss=1.0, take_profit=2.0, loss_cut_pips=5.0
+    )
     context = DecisionContext(
         position_size=0.0,
         risk_budget=risk.max_position,
@@ -130,7 +138,9 @@ def test_decision_policy_triggers_take_profit_for_buy() -> None:
 
 def test_decision_policy_triggers_loss_cut_for_sell() -> None:
     policy = DecisionPolicy(score_threshold=0.9, lot_size=1.0)
-    risk = RiskParams(max_position=1.0, stop_loss=1.0, take_profit=2.0, loss_cut_pips=1.0)
+    risk = RiskParams(
+        max_position=1.0, stop_loss=1.0, take_profit=2.0, loss_cut_pips=1.0
+    )
     context = DecisionContext(
         position_size=0.0,
         risk_budget=risk.max_position,
@@ -155,7 +165,9 @@ def test_decision_policy_triggers_loss_cut_for_sell() -> None:
 
 def test_decision_policy_triggers_take_profit_for_sell() -> None:
     policy = DecisionPolicy(score_threshold=0.9, lot_size=1.0)
-    risk = RiskParams(max_position=1.0, stop_loss=1.0, take_profit=1.0, loss_cut_pips=5.0)
+    risk = RiskParams(
+        max_position=1.0, stop_loss=1.0, take_profit=1.0, loss_cut_pips=5.0
+    )
     context = DecisionContext(
         position_size=0.0,
         risk_budget=risk.max_position,

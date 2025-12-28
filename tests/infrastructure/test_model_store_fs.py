@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
-from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import ModelStoreFs
+from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import (
+    ModelStoreFs,
+)
 
 
 @dataclass

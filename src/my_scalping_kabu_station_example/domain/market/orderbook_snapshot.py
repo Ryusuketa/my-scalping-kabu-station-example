@@ -6,10 +6,19 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import List, Optional
 
-from my_scalping_kabu_station_example.domain.market.invariants import is_sorted_asks, is_sorted_bids
+from my_scalping_kabu_station_example.domain.market.invariants import (
+    is_sorted_asks,
+    is_sorted_bids,
+)
 from my_scalping_kabu_station_example.domain.market.level import Level
 from my_scalping_kabu_station_example.domain.market.time import Timestamp
-from my_scalping_kabu_station_example.domain.market.types import PriceKey, PriceQtyMap, Quantity, Side, Symbol
+from my_scalping_kabu_station_example.domain.market.types import (
+    PriceKey,
+    PriceQtyMap,
+    Quantity,
+    Side,
+    Symbol,
+)
 
 
 @dataclass(slots=True)
@@ -61,7 +70,9 @@ class OrderBookSnapshot:
             # Crossed book: leave mid undefined to signal invalid snapshot.
             self.mid = None
             return
-        mid_value = (Decimal(self.best_bid_price) + Decimal(self.best_ask_price)) / Decimal(2)
+        mid_value = (
+            Decimal(self.best_bid_price) + Decimal(self.best_ask_price)
+        ) / Decimal(2)
         self.mid = PriceKey(mid_value)
 
     def depth_levels(self, side: Side) -> List[Level]:

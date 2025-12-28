@@ -7,29 +7,35 @@ from typing import Any, Dict, Optional, Protocol
 
 from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
 from my_scalping_kabu_station_example.domain.features.state import FeatureState
-from my_scalping_kabu_station_example.domain.order_book import OrderBookSnapshot, OrderBookUpdate
-from my_scalping_kabu_station_example.domain.ports import FeatureEnginePort, HistoryStore, SnapshotBuffer
+from my_scalping_kabu_station_example.domain.order_book import (
+    OrderBookSnapshot,
+    OrderBookUpdate,
+)
+from my_scalping_kabu_station_example.domain.ports import (
+    FeatureEnginePort,
+    HistoryStore,
+    SnapshotBuffer,
+)
 
 
 class ModelPredictor(Protocol):
     """Prediction interface for trained models."""
 
-    def predict(self, features: Dict[str, float]) -> Any:
-        ...
+    def predict(self, features: Dict[str, float]) -> Any: ...
 
 
 class DecisionPolicy(Protocol):
     """Decision policy producing trade intents."""
 
-    def decide(self, inference_result: Any, position_state: Any, risk_params: Any) -> Any:
-        ...
+    def decide(
+        self, inference_result: Any, position_state: Any, risk_params: Any
+    ) -> Any: ...
 
 
 class OrderPort(Protocol):
     """Order submission interface."""
 
-    def place_order(self, trade_intent: Any) -> Any:
-        ...
+    def place_order(self, trade_intent: Any) -> Any: ...
 
 
 @dataclass
@@ -68,7 +74,9 @@ class PersistAndBufferNode:
     history_store: HistoryStore
     buffer: SnapshotBuffer
 
-    def persist_and_buffer(self, snapshot: OrderBookSnapshot) -> OrderBookSnapshot | None:
+    def persist_and_buffer(
+        self, snapshot: OrderBookSnapshot
+    ) -> OrderBookSnapshot | None:
         self.history_store.append(snapshot)
         return self.buffer.update(snapshot)
 

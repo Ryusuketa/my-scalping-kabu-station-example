@@ -1,6 +1,8 @@
 import pytest
 
-from my_scalping_kabu_station_example.application.service.pipelines.instrument_sync import InstrumentSync
+from my_scalping_kabu_station_example.application.service.pipelines.instrument_sync import (
+    InstrumentSync,
+)
 from my_scalping_kabu_station_example.domain.instruments.instrument import Instrument
 from my_scalping_kabu_station_example.domain.instruments.registry import InstrumentList
 from my_scalping_kabu_station_example.domain.market.types import Symbol

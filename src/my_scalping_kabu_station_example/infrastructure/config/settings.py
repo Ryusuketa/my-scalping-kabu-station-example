@@ -46,10 +46,13 @@ def load_settings(data: Mapping[str, Any] | None = None) -> Settings:
             env_params_obj = {}
         feature_spec = FeatureSpec(
             version=str(
-                feature_cfg.get("version") or os.environ.get("FEATURE_SPEC_VERSION", "ob10_v1")
+                feature_cfg.get("version")
+                or os.environ.get("FEATURE_SPEC_VERSION", "ob10_v1")
             ),
             eps=float(
-                feature_cfg.get("eps") if feature_cfg.get("eps") is not None else os.environ.get("FEATURE_SPEC_EPS", 1e-9)
+                feature_cfg.get("eps")
+                if feature_cfg.get("eps") is not None
+                else os.environ.get("FEATURE_SPEC_EPS", 1e-9)
             ),
             params=dict(feature_cfg.get("params") or env_params_obj),
             features=list(feature_cfg.get("features", [])),
@@ -62,23 +65,35 @@ def load_settings(data: Mapping[str, Any] | None = None) -> Settings:
         risk_cfg = risk_cfg or {}
         risk_params = RiskParams(
             max_position=float(
-                risk_cfg.get("max_position") if risk_cfg.get("max_position") is not None else os.environ.get("RISK_MAX_POSITION", 1.0)
+                risk_cfg.get("max_position")
+                if risk_cfg.get("max_position") is not None
+                else os.environ.get("RISK_MAX_POSITION", 1.0)
             ),
             stop_loss=float(
-                risk_cfg.get("stop_loss") if risk_cfg.get("stop_loss") is not None else os.environ.get("RISK_STOP_LOSS", 1.0)
+                risk_cfg.get("stop_loss")
+                if risk_cfg.get("stop_loss") is not None
+                else os.environ.get("RISK_STOP_LOSS", 1.0)
             ),
             take_profit=float(
-                risk_cfg.get("take_profit") if risk_cfg.get("take_profit") is not None else os.environ.get("RISK_TAKE_PROFIT", 1.0)
+                risk_cfg.get("take_profit")
+                if risk_cfg.get("take_profit") is not None
+                else os.environ.get("RISK_TAKE_PROFIT", 1.0)
             ),
             cooldown_seconds=float(
-                risk_cfg.get("cooldown_seconds") if risk_cfg.get("cooldown_seconds") is not None else os.environ.get("RISK_COOLDOWN_SECONDS", 0.0)
+                risk_cfg.get("cooldown_seconds")
+                if risk_cfg.get("cooldown_seconds") is not None
+                else os.environ.get("RISK_COOLDOWN_SECONDS", 0.0)
             ),
             loss_cut_pips=float(
-                risk_cfg.get("loss_cut_pips") if risk_cfg.get("loss_cut_pips") is not None else os.environ.get("RISK_LOSS_CUT_PIPS", 0.0)
+                risk_cfg.get("loss_cut_pips")
+                if risk_cfg.get("loss_cut_pips") is not None
+                else os.environ.get("RISK_LOSS_CUT_PIPS", 0.0)
             ),
         )
 
-    history_path_value = config.get("history_path") or os.environ.get("HISTORY_PATH") or "data/history"
+    history_path_value = (
+        config.get("history_path") or os.environ.get("HISTORY_PATH") or "data/history"
+    )
     history_path = Path(history_path_value)
     ws_url = config.get("ws_url") or os.environ.get("WS_URL") or "ws://localhost:18081"
     ws_api_key = config.get("ws_api_key") or os.environ.get("WS_API_KEY")

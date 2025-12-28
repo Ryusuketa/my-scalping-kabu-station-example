@@ -1,5 +1,8 @@
 from my_scalping_kabu_station_example.domain.features.expr import Const
-from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
+from my_scalping_kabu_station_example.domain.features.spec import (
+    FeatureDef,
+    FeatureSpec,
+)
 from my_scalping_kabu_station_example.infrastructure.ml.schema import feature_ordering
 
 

@@ -1,7 +1,10 @@
 import math
 
 from my_scalping_kabu_station_example.domain.features.expr import Const
-from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
+from my_scalping_kabu_station_example.domain.features.spec import (
+    FeatureDef,
+    FeatureSpec,
+)
 from my_scalping_kabu_station_example.infrastructure.ml.xgb_trainer import XgbTrainer
 
 
@@ -18,7 +21,9 @@ def test_xgb_trainer_trains_model_when_labels_present() -> None:
         {"a": 0.3, "b": 0.1, "label": 1},
     ]
 
-    predictor = XgbTrainer(params={"n_estimators": 5, "max_depth": 2}).train(spec, dataset)
+    predictor = XgbTrainer(params={"n_estimators": 5, "max_depth": 2}).train(
+        spec, dataset
+    )
 
     assert predictor.model is not None
     result = predictor.predict({"a": 0.15, "b": 0.25})

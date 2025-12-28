@@ -1,16 +1,31 @@
 from datetime import datetime, timezone
 
 from my_scalping_kabu_station_example.domain.features.expr import MicroPrice
-from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
+from my_scalping_kabu_station_example.domain.features.spec import (
+    FeatureDef,
+    FeatureSpec,
+)
 from my_scalping_kabu_station_example.domain.market.level import Level
-from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import (
+    OrderBookSnapshot,
+)
 from my_scalping_kabu_station_example.domain.market.time import Timestamp
-from my_scalping_kabu_station_example.domain.market.types import Quantity, Symbol, price_key_from
+from my_scalping_kabu_station_example.domain.market.types import (
+    Quantity,
+    Symbol,
+    price_key_from,
+)
 from my_scalping_kabu_station_example.application.service.dataset import DatasetBuilder
-from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
+from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import (
+    PandasOrderBookFeatureEngine,
+)
 from my_scalping_kabu_station_example.infrastructure.ml.xgb_trainer import XgbTrainer
-from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
-from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import ModelStoreFs
+from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import (
+    CsvHistoryStore,
+)
+from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import (
+    ModelStoreFs,
+)
 
 
 def _make_snapshot(ts: datetime, bid: str, ask: str) -> OrderBookSnapshot:

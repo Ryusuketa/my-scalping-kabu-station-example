@@ -24,8 +24,12 @@ def load_instruments(path: str) -> InstrumentList:
             if not symbol:
                 continue
             metadata: Dict[str, str] = {
-                key: value for key, value in row.items() if key != "symbol" and value not in (None, "")
+                key: value
+                for key, value in row.items()
+                if key != "symbol" and value not in (None, "")
             }
-            instruments.append(Instrument(symbol=Symbol(symbol), metadata=metadata or None))
+            instruments.append(
+                Instrument(symbol=Symbol(symbol), metadata=metadata or None)
+            )
 
     return InstrumentList(instruments=instruments)

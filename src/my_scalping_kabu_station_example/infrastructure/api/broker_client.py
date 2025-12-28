@@ -11,12 +11,15 @@ if TYPE_CHECKING:
     from my_scalping_kabu_station_example.application.ports.broker import OrderStatePort
     from my_scalping_kabu_station_example.domain.decision.signal import OrderSide
 
+
 @dataclass
 class BrokerClient:
     base_url: str
     timeout_seconds: float = 5.0
 
-    def place_order(self, data: Mapping[str, Any], api_key: str | None = None) -> Mapping[str, Any]:
+    def place_order(
+        self, data: Mapping[str, Any], api_key: str | None = None
+    ) -> Mapping[str, Any]:
         headers = {"X-API-KEY": api_key} if api_key else None
         response = requests.post(
             f"{self.base_url}/sendorder",
@@ -49,13 +52,19 @@ class KabuOrderPort:
     order_store: "OrderStatePort | None" = None
 
     def place_order(self, intent) -> str:
-        from my_scalping_kabu_station_example.infrastructure.api.mapper import build_order_payload
+        from my_scalping_kabu_station_example.infrastructure.api.mapper import (
+            build_order_payload,
+        )
 
-        payload = build_order_payload(intent, base_payload=self.base_payload, side_override=self.side_override)
+        payload = build_order_payload(
+            intent, base_payload=self.base_payload, side_override=self.side_override
+        )
         response = self.client.place_order(payload, api_key=self.api_key)
         order_id = str(response.get("OrderId") or intent.intent_id)
         if self.order_store is not None:
-            from my_scalping_kabu_station_example.domain.order.realtime_order import RealTimeOrder
+            from my_scalping_kabu_station_example.domain.order.realtime_order import (
+                RealTimeOrder,
+            )
 
             cash_margin = int(payload["CashMargin"])
             qty = int(payload["Qty"])
