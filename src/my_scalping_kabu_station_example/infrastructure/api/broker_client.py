@@ -63,7 +63,7 @@ class KabuOrderPort:
             order = RealTimeOrder(
                 symbol=intent.symbol,
                 qty=qty,
-                side=side_override or intent.side,
+                side=self.side_override or intent.side,
                 cash_margin=cash_margin,
                 order_id=order_id,
                 price=price,
