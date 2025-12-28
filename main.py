@@ -61,8 +61,8 @@ class SimpleMarketDataSource:
 
 
 class WebSocketMarketDataSource:
-    def __init__(self, url: str) -> None:
-        self.client = WebSocketClient(url=url)
+    def __init__(self, url: str, api_key: str | None = None) -> None:
+        self.client = WebSocketClient(url=url, api_key=api_key)
 
     def subscribe(self) -> None:
         self.client.connect()
@@ -192,7 +192,7 @@ def main() -> None:
     max_iterations = int(os.getenv("MAX_ITERATIONS", "5"))
 
     if ws_url:
-        market_data = WebSocketMarketDataSource(ws_url)
+        market_data = WebSocketMarketDataSource(ws_url, api_key=os.getenv("KABU_API_TOKEN"))
         market_data.subscribe()
     else:
         market_data = SimpleMarketDataSource(_mock_snapshots(max_iterations))
