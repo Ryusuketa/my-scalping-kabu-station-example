@@ -16,7 +16,7 @@ class DummyInstrumentPort:
         return self.instruments
 
     def get(self, symbol: Symbol):  # pragma: no cover - unused
-        raise NotImplementedError
+        return self.instruments.find(symbol)
 
 
 def test_instrument_sync_returns_registry() -> None:

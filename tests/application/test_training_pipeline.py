@@ -51,7 +51,7 @@ class DummyModelStore:
         self.swapped: list[DummyPredictor] = []
 
     def load_active(self):  # pragma: no cover - unused
-        raise NotImplementedError
+        return None
 
     def save_candidate(self, predictor: DummyPredictor) -> None:
         self.saved.append(predictor)
