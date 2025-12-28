@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Sequence
 
 from my_scalping_kabu_station_example.application.ports.history import HistoryStorePort
 from my_scalping_kabu_station_example.domain.market.level import Level
@@ -28,13 +28,14 @@ class CsvHistoryStore(HistoryStorePort):
         self.fieldnames += [f"ask_p{i}" for i in range(1, 11)] + [f"ask_q{i}" for i in range(1, 11)]
 
     def append(self, snapshot: OrderBookSnapshot) -> None:
-        """Append a snapshot to CSV, writing header on first write."""
+        """Append a snapshot to an hourly CSV, writing header on first write."""
 
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        write_header = not self.path.exists()
+        target_path = self._hourly_path(snapshot.ts)
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        write_header = not target_path.exists()
         row = self._snapshot_to_row(snapshot)
 
-        with self.path.open("a", newline="") as f:
+        with target_path.open("a", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=self.fieldnames)
             if write_header:
                 writer.writeheader()
@@ -43,18 +44,37 @@ class CsvHistoryStore(HistoryStorePort):
     def read_range(self, start: datetime, end: datetime) -> Iterable[OrderBookSnapshot]:
         """Load snapshots whose timestamps fall within [start, end]."""
 
-        if not self.path.exists():
+        files = self._files_for_range(start, end)
+        if not files:
             return []
 
         snapshots: List[OrderBookSnapshot] = []
-        with self.path.open("r", newline="") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                ts = Timestamp(datetime.fromisoformat(row["ts"]))
-                if ts < start or ts > end:
-                    continue
-                snapshots.append(self._row_to_snapshot(row))
+        for file_path in files:
+            with file_path.open("r", newline="") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    ts = Timestamp(datetime.fromisoformat(row["ts"]))
+                    if ts < start or ts > end:
+                        continue
+                    snapshots.append(self._row_to_snapshot(row))
         return snapshots
+
+    def _hourly_path(self, ts: datetime) -> Path:
+        ts_utc = ts.astimezone(timezone.utc) if ts.tzinfo else ts
+        suffix = ts_utc.strftime("%Y%m%d_%H")
+        return self.path.with_name(f"{self.path.stem}_{suffix}{self.path.suffix}")
+
+    def _files_for_range(self, start: datetime, end: datetime) -> Sequence[Path]:
+        if start > end:
+            return []
+        start_hour = start.replace(minute=0, second=0, microsecond=0)
+        end_hour = end.replace(minute=0, second=0, microsecond=0)
+        current = start_hour
+        files: List[Path] = []
+        while current <= end_hour:
+            files.append(self._hourly_path(current))
+            current += timedelta(hours=1)
+        return [path for path in files if path.exists()]
 
     def _snapshot_to_row(self, snapshot: OrderBookSnapshot) -> Dict[str, object]:
         row: Dict[str, object] = {"ts": snapshot.ts.isoformat(), "symbol": snapshot.symbol}

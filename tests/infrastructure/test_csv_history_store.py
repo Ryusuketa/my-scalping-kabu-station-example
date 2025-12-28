@@ -19,8 +19,8 @@ def _make_snapshot(ts: datetime, bid_price: str, ask_price: str) -> OrderBookSna
 def test_csv_history_store_persists_and_reads(tmp_path) -> None:
     path = tmp_path / "history.csv"
     store = CsvHistoryStore(path=path)
-    ts0 = datetime(2024, 1, 1, tzinfo=timezone.utc)
-    ts1 = ts0 + timedelta(seconds=1)
+    ts0 = datetime(2024, 1, 1, 10, 59, 59, tzinfo=timezone.utc)
+    ts1 = ts0 + timedelta(seconds=2)
     snap0 = _make_snapshot(ts0, bid_price="100.0", ask_price="100.5")
     snap1 = _make_snapshot(ts1, bid_price="100.1", ask_price="100.6")
 
@@ -36,8 +36,8 @@ def test_csv_history_store_persists_and_reads(tmp_path) -> None:
 def test_csv_history_store_filters_by_time(tmp_path) -> None:
     path = tmp_path / "history.csv"
     store = CsvHistoryStore(path=path)
-    ts0 = datetime(2024, 1, 1, tzinfo=timezone.utc)
-    ts1 = ts0 + timedelta(seconds=1)
+    ts0 = datetime(2024, 1, 1, 9, 0, 0, tzinfo=timezone.utc)
+    ts1 = ts0 + timedelta(minutes=30)
     snap0 = _make_snapshot(ts0, bid_price="100.0", ask_price="100.5")
     snap1 = _make_snapshot(ts1, bid_price="100.1", ask_price="100.6")
 
