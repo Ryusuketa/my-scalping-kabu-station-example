@@ -75,3 +75,26 @@ def test_decision_policy_triggers_loss_cut() -> None:
     assert intent.cash_margin == 3
     assert intent.side is OrderSide.SELL
     assert intent.quantity == 2.0
+
+
+def test_decision_policy_triggers_take_profit() -> None:
+    policy = DecisionPolicy(score_threshold=0.9, lot_size=1.0)
+    risk = RiskParams(max_position=1.0, stop_loss=1.0, take_profit=2.0, loss_cut_pips=5.0)
+    context = DecisionContext(
+        position_size=0.0,
+        risk_budget=risk.max_position,
+        symbol=Symbol("TEST"),
+        price=105.0,
+        has_open_order=True,
+        open_order_side=OrderSide.BUY,
+        open_order_price=100.0,
+        open_order_qty=100,
+    )
+    inference = InferenceResult(features={}, score=0.0)
+
+    intent = policy.decide(inference, context, risk)
+
+    assert intent is not None
+    assert intent.cash_margin == 3
+    assert intent.side is OrderSide.SELL
+    assert intent.quantity == 1.0

@@ -24,9 +24,9 @@ class DecisionPolicy:
         * otherwise: no trade
         """
 
-        loss_cut = self._loss_cut_intent(context, risk)
-        if loss_cut is not None:
-            return loss_cut
+        exit_intent = self._exit_intent(context, risk)
+        if exit_intent is not None:
+            return exit_intent
 
         score = inference.score
         if score > self.score_threshold:
@@ -69,20 +69,24 @@ class DecisionPolicy:
             return 0.0
         return min(self.lot_size, available)
 
-    def _loss_cut_intent(self, context: DecisionContext, risk: RiskParams) -> TradeIntent | None:
-        if not context.has_open_order or risk.loss_cut_pips <= 0:
+    def _exit_intent(self, context: DecisionContext, risk: RiskParams) -> TradeIntent | None:
+        if not context.has_open_order:
             return None
         if context.open_order_price is None or context.open_order_side is None or context.open_order_qty is None:
             return None
 
         if context.open_order_side is OrderSide.BUY:
             loss_pips = context.open_order_price - context.price
+            gain_pips = context.price - context.open_order_price
             repay_side = OrderSide.SELL
         else:
             loss_pips = context.price - context.open_order_price
+            gain_pips = context.open_order_price - context.price
             repay_side = OrderSide.BUY
 
-        if loss_pips < risk.loss_cut_pips:
+        loss_triggered = risk.loss_cut_pips > 0 and loss_pips >= risk.loss_cut_pips
+        gain_triggered = risk.take_profit > 0 and gain_pips >= risk.take_profit
+        if not (loss_triggered or gain_triggered):
             return None
 
         quantity_units = context.open_order_qty / 100.0
