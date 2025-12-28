@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, Optional
 
+from my_scalping_kabu_station_example.domain.market.types import Symbol
 
 class OrderSide(str, Enum):
     BUY = "BUY"
@@ -28,6 +29,8 @@ class TradeIntent:
     intent_id: str
     side: OrderSide
     quantity: float
+    symbol: Optional[Symbol] = None
+    price: Optional[float] = None
     metadata: Optional[Dict[str, Any]] = None
 
 

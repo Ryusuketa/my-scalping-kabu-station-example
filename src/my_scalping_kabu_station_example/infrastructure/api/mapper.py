@@ -12,9 +12,7 @@ from my_scalping_kabu_station_example.infrastructure.api.dto import OrderRequest
 def to_api(intent: TradeIntent) -> OrderRequestDto:
     """Convert a TradeIntent into an API order request DTO."""
 
-    symbol_value = None
-    if intent.metadata and "symbol" in intent.metadata:
-        symbol_value = Symbol(str(intent.metadata["symbol"]))
+    symbol_value = intent.symbol
     return OrderRequestDto(
         intent_id=intent.intent_id,
         side=intent.side,
@@ -34,9 +32,13 @@ def build_order_payload(
     payload.update(intent.metadata or {})
     if "symbol" in payload and "Symbol" not in payload:
         payload["Symbol"] = payload["symbol"]
+    if intent.symbol is not None:
+        payload["Symbol"] = intent.symbol
+    if intent.price is not None:
+        payload["Price"] = intent.price
     side_value = side_override or intent.side
     payload["Side"] = "2" if side_value is OrderSide.BUY else "1"
-    payload["Qty"] = int(intent.quantity)
+    payload["Qty"] = int(intent.quantity * 100)
 
     required = {
         "Symbol",
