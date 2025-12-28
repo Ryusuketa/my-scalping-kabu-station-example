@@ -67,8 +67,10 @@ class CsvHistoryStore(HistoryStorePort):
     def _files_for_range(self, start: datetime, end: datetime) -> Sequence[Path]:
         if start > end:
             return []
-        start_hour = start.replace(minute=0, second=0, microsecond=0)
-        end_hour = end.replace(minute=0, second=0, microsecond=0)
+        start_utc = start.astimezone(timezone.utc) if start.tzinfo else start
+        end_utc = end.astimezone(timezone.utc) if end.tzinfo else end
+        start_hour = start_utc.replace(minute=0, second=0, microsecond=0)
+        end_hour = end_utc.replace(minute=0, second=0, microsecond=0)
         current = start_hour
         files: List[Path] = []
         while current <= end_hour:
