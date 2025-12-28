@@ -1,6 +1,6 @@
 import pytest
 
-from my_scalping_kabu_station_example.infrastructure.websocket.client import MockWebSocketClient
+from tests.helpers.mock_ws_client import MockWebSocketClient
 
 
 def test_mock_websocket_client_replays_messages() -> None:

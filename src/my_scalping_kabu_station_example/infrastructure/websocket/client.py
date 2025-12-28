@@ -1,8 +1,8 @@
-"""WebSocket client placeholder."""
+"""WebSocket client implementation."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Optional
 
 from websockets.sync.client import connect
@@ -27,23 +27,3 @@ class WebSocketClient:
         if self._conn is not None:
             self._conn.close()
             self._conn = None
-
-
-@dataclass
-class MockWebSocketClient:
-    messages: list[Any] = field(default_factory=list)
-    connected: bool = False
-    closed: bool = False
-
-    def connect(self) -> None:
-        self.connected = True
-
-    def receive(self) -> Any:
-        if not self.connected or self.closed:
-            raise RuntimeError("MockWebSocketClient is not connected")
-        if not self.messages:
-            raise StopIteration("No more mock messages")
-        return self.messages.pop(0)
-
-    def close(self) -> None:
-        self.closed = True

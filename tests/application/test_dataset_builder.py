@@ -1,41 +1,43 @@
-from typing import Iterable, List
+from datetime import datetime, timezone
+
+import pytest
 
 from my_scalping_kabu_station_example.application.service.dataset import DatasetBuilder
-from my_scalping_kabu_station_example.domain.features.expr import Const
+from my_scalping_kabu_station_example.domain.features.expr import MicroPrice
 from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
+from my_scalping_kabu_station_example.domain.market.level import Level
 from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.time import Timestamp
+from my_scalping_kabu_station_example.domain.market.types import Quantity, Symbol, price_key_from
+from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
+from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
 
 
-class DummyHistoryStore:
-    def __init__(self) -> None:
-        self.appended: List[OrderBookSnapshot] = []
-
-    def append(self, snapshot: OrderBookSnapshot) -> None:  # pragma: no cover - unused
-        self.appended.append(snapshot)
-
-    def read_range(self, *_args, **_kwargs) -> Iterable[OrderBookSnapshot]:  # pragma: no cover - unused
-        return []
+def _make_snapshot(ts: datetime, bid: str, ask: str) -> OrderBookSnapshot:
+    return OrderBookSnapshot(
+        ts=Timestamp(ts),
+        symbol=Symbol("TEST"),
+        bid_levels=[Level(price_key_from(bid), Quantity(1.0))],
+        ask_levels=[Level(price_key_from(ask), Quantity(2.0))],
+    )
 
 
-class DummyFeatureEngine:
-    def __init__(self) -> None:
-        self.batch_calls: list[tuple[FeatureSpec, Iterable[OrderBookSnapshot]]] = []
-        self.return_value = [{"x": 1.0}, {"x": 2.0}]
-
-    def compute_batch(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]):
-        self.batch_calls.append((spec, snapshots))
-        yield from self.return_value
-
-
-def test_dataset_builder_collects_features() -> None:
-    spec = FeatureSpec(version="v1", eps=1e-9, params={}, features=[FeatureDef("x", Const(1.0))])
-    history_store = DummyHistoryStore()
-    feature_engine = DummyFeatureEngine()
+def test_dataset_builder_collects_features(tmp_path) -> None:
+    spec = FeatureSpec.from_features(
+        version="v1",
+        eps=1e-9,
+        params={},
+        features=[FeatureDef("microprice", MicroPrice(eps=1e-9))],
+    )
+    history_store = CsvHistoryStore(path=tmp_path / "history.csv")
+    feature_engine = PandasOrderBookFeatureEngine()
     builder = DatasetBuilder(history_store=history_store, feature_engine=feature_engine)
-    snapshots: list[OrderBookSnapshot] = []
+    ts0 = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    ts1 = datetime(2024, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
+    snapshots = [_make_snapshot(ts0, "100.0", "100.5"), _make_snapshot(ts1, "100.1", "100.6")]
 
     features = builder.build(spec, snapshots)
 
-    assert features == feature_engine.return_value
-    assert feature_engine.batch_calls[0][0] == spec
-    assert feature_engine.batch_calls[0][1] is snapshots
+    assert len(features) == 2
+    expected = (100.5 * 1.0 + 100.0 * 2.0) / (1.0 + 2.0 + 1e-9)
+    assert features[0]["microprice"] == pytest.approx(expected)

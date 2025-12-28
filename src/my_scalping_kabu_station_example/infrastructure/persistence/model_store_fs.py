@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from my_scalping_kabu_station_example.application.ports.model import ModelPredictorPort, ModelStorePort
+from my_scalping_kabu_station_example.domain.market.types import Symbol
 
 
 @dataclass
@@ -41,3 +42,20 @@ class ModelStoreFs(ModelStorePort):
         with tmp_path.open("wb") as handle:
             pickle.dump(predictor, handle)
         tmp_path.replace(path)
+
+
+@dataclass
+class SymbolModelStore:
+    base_dir: Path
+
+    def _store_for(self, symbol: Symbol) -> ModelStoreFs:
+        return ModelStoreFs(base_dir=Path(self.base_dir) / str(symbol))
+
+    def load_active_for(self, symbol: Symbol) -> ModelPredictorPort:
+        return self._store_for(symbol).load_active()
+
+    def save_candidate_for(self, symbol: Symbol, predictor: ModelPredictorPort) -> None:
+        self._store_for(symbol).save_candidate(predictor)
+
+    def swap_active_for(self, symbol: Symbol, predictor: ModelPredictorPort) -> None:
+        self._store_for(symbol).swap_active(predictor)

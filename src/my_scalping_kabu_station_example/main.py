@@ -1,4 +1,4 @@
-"""Entrypoint for trainer process."""
+"""Main entrypoint for startup training."""
 
 from __future__ import annotations
 

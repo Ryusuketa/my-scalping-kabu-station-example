@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import csv
+import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, Iterable, List, Sequence
+from datetime import date
 
 from my_scalping_kabu_station_example.application.ports.history import HistoryStorePort
 from my_scalping_kabu_station_example.domain.market.level import Level
@@ -23,6 +25,8 @@ class CsvHistoryStore(HistoryStorePort):
 
     def __post_init__(self) -> None:
         self.path = Path(self.path)
+        if self.path.suffix and self.path.suffix != ".csv":
+            raise ValueError("CsvHistoryStore path must be a directory or .csv file path")
         self.fieldnames = ["ts", "symbol"]
         self.fieldnames += [f"bid_p{i}" for i in range(1, 11)] + [f"bid_q{i}" for i in range(1, 11)]
         self.fieldnames += [f"ask_p{i}" for i in range(1, 11)] + [f"ask_q{i}" for i in range(1, 11)]
@@ -62,7 +66,9 @@ class CsvHistoryStore(HistoryStorePort):
     def _hourly_path(self, ts: datetime) -> Path:
         ts_utc = ts.astimezone(timezone.utc) if ts.tzinfo else ts
         suffix = ts_utc.strftime("%Y%m%d_%H")
-        return self.path.with_name(f"{self.path.stem}_{suffix}{self.path.suffix}")
+        if self.path.suffix == ".csv":
+            return self.path.with_name(f"{self.path.stem}_{suffix}{self.path.suffix}")
+        return self.path / f"history_{suffix}.csv"
 
     def _files_for_range(self, start: datetime, end: datetime) -> Sequence[Path]:
         if start > end:
@@ -77,6 +83,33 @@ class CsvHistoryStore(HistoryStorePort):
             files.append(self._hourly_path(current))
             current += timedelta(hours=1)
         return [path for path in files if path.exists()]
+
+    def available_dates(self) -> List[date]:
+        """Return available dates based on hourly CSV filenames."""
+
+        base_dir = self.path.parent if self.path.suffix == ".csv" else self.path
+        if not base_dir.exists():
+            return []
+
+        if self.path.suffix == ".csv":
+            stem = re.escape(self.path.stem)
+            suffix = re.escape(self.path.suffix)
+            pattern = re.compile(rf"^{stem}_(\d{{8}})_(\d{{2}}){suffix}$")
+        else:
+            pattern = re.compile(r"^history_(\d{8})_(\d{2})\.csv$")
+        dates: set[date] = set()
+        for entry in base_dir.iterdir():
+            if not entry.is_file():
+                continue
+            match = pattern.match(entry.name)
+            if not match:
+                continue
+            day_str = match.group(1)
+            try:
+                dates.add(datetime.strptime(day_str, "%Y%m%d").date())
+            except ValueError:
+                continue
+        return sorted(dates)
 
     def _snapshot_to_row(self, snapshot: OrderBookSnapshot) -> Dict[str, object]:
         row: Dict[str, object] = {"ts": snapshot.ts.isoformat(), "symbol": snapshot.symbol}

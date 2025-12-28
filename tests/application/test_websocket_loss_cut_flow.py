@@ -1,86 +1,23 @@
 import json
 from datetime import datetime, timezone
-from typing import List
 
 from my_scalping_kabu_station_example.application.service.order_handler import OrderHandler
 from my_scalping_kabu_station_example.application.service.pipelines.inference_pipeline import InferencePipeline
-from my_scalping_kabu_station_example.application.service.state.feature_state import FeatureState
 from my_scalping_kabu_station_example.application.service.state.stream_state import StreamState
 from my_scalping_kabu_station_example.domain.decision.policy import DecisionPolicy
 from my_scalping_kabu_station_example.domain.decision.risk import RiskParams
-from my_scalping_kabu_station_example.domain.decision.signal import InferenceResult
-from my_scalping_kabu_station_example.domain.features.expr import Const
+from my_scalping_kabu_station_example.domain.features.expr import MicroPrice
 from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
 from my_scalping_kabu_station_example.infrastructure.api.broker_client import KabuOrderPort
+from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
 from my_scalping_kabu_station_example.infrastructure.memory.order_store import InMemoryOrderStore
+from my_scalping_kabu_station_example.infrastructure.memory.position_port import InMemoryPositionPort
 from my_scalping_kabu_station_example.infrastructure.memory.ring_buffer import InMemoryMarketBuffer
-from my_scalping_kabu_station_example.infrastructure.websocket.client import MockWebSocketClient
-from my_scalping_kabu_station_example.infrastructure.websocket.dto import OrderBookDto
-from my_scalping_kabu_station_example.infrastructure.websocket.mapper import to_domain
-
-
-class MockWebSocketMarketData:
-    def __init__(self, messages: List[str]) -> None:
-        self.client = MockWebSocketClient(messages=messages)
-
-    def subscribe(self) -> None:
-        self.client.connect()
-
-    def close(self) -> None:
-        self.client.close()
-
-    def receive(self):
-        payload = self.client.receive()
-        data = json.loads(payload)
-        dto = OrderBookDto(ts=data["ts"], symbol=data["symbol"], bids=data["bids"], asks=data["asks"])
-        return to_domain(dto)
-
-
-class DummyHistoryStore:
-    def __init__(self) -> None:
-        self.appended = []
-
-    def append(self, snapshot) -> None:
-        self.appended.append(snapshot)
-
-    def read_range(self, *_args, **_kwargs):  # pragma: no cover - unused
-        return []
-
-
-class DummyFeatureEngine:
-    def compute_one(self, *_args, **_kwargs):
-        return {"x": 0.0}, FeatureState()
-
-    def compute_batch(self, *_args, **_kwargs):  # pragma: no cover - unused
-        return []
-
-
-class SequencedPredictor:
-    def __init__(self, scores: List[float]) -> None:
-        self.scores = scores
-
-    def predict(self, features):
-        score = self.scores.pop(0)
-        return InferenceResult(features=features, score=score)
-
-
-class DummyModelStore:
-    def __init__(self, predictor) -> None:
-        self.predictor = predictor
-
-    def load_active(self):
-        return self.predictor
-
-    def save_candidate(self, *_args, **_kwargs):  # pragma: no cover - unused
-        return None
-
-    def swap_active(self, *_args, **_kwargs):  # pragma: no cover - unused
-        return None
-
-
-class DummyPositionPort:
-    def current_position(self) -> float:
-        return 0.0
+from my_scalping_kabu_station_example.infrastructure.ml.xgb_predictor import XgbPredictor
+from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
+from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import ModelStoreFs
+from tests.helpers.mock_ws_client import MockWebSocketClient
+from my_scalping_kabu_station_example.infrastructure.websocket.market_data import WebSocketMarketDataSource
 
 
 class DummyBrokerClient:
@@ -109,14 +46,14 @@ def _ws_message(ts: datetime, symbol: str, bid: float, ask: float) -> str:
     )
 
 
-def test_websocket_flow_places_loss_cut_after_fill() -> None:
+def test_websocket_flow_places_loss_cut_after_fill(tmp_path) -> None:
     ts0 = datetime(2024, 1, 1, tzinfo=timezone.utc)
     ts1 = datetime(2024, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
     messages = [
         _ws_message(ts0, "TEST", 100.0, 100.5),
         _ws_message(ts1, "TEST", 98.0, 98.5),
     ]
-    market_data = MockWebSocketMarketData(messages)
+    market_data = WebSocketMarketDataSource(client=MockWebSocketClient(messages=messages))
     market_data.subscribe()
 
     order_store = InMemoryOrderStore()
@@ -135,21 +72,29 @@ def test_websocket_flow_places_loss_cut_after_fill() -> None:
         order_store=order_store,
     )
     order_handler = OrderHandler(order_store=order_store, broker_client=broker_client, api_key="token")
-    predictor = SequencedPredictor([1.0, 0.0])
-    model_store = DummyModelStore(predictor)
-    feature_spec = FeatureSpec(version="v1", eps=1e-9, params={}, features=[FeatureDef("x", Const(1.0))])
+    predictor = XgbPredictor(feature_order=["microprice"], model=None, default_score=1.0)
+    model_store = ModelStoreFs(base_dir=tmp_path / "models")
+    model_store.save_candidate(predictor)
+    model_store.swap_active(predictor)
+    feature_spec = FeatureSpec.from_features(
+        version="v1",
+        eps=1e-9,
+        params={},
+        features=[FeatureDef("microprice", MicroPrice(eps=1e-9))],
+    )
     policy = DecisionPolicy(score_threshold=0.5, lot_size=1.0)
     risk = RiskParams(max_position=1.0, stop_loss=1.0, take_profit=0.0, loss_cut_pips=1.0)
 
     pipeline = InferencePipeline(
         market_data=market_data,
-        history_store=DummyHistoryStore(),
+        history_store=CsvHistoryStore(path=tmp_path / "history.csv"),
         buffer=InMemoryMarketBuffer(),
-        feature_engine=DummyFeatureEngine(),
+        feature_engine=PandasOrderBookFeatureEngine(),
         model_store=model_store,
         order_port=order_port,
-        position_port=DummyPositionPort(),
+        position_port=InMemoryPositionPort(position=0.0),
         order_state=order_store,
+        order_handler=order_handler,
         feature_spec=feature_spec,
         decision_policy=policy,
         risk_params=risk,
@@ -158,7 +103,6 @@ def test_websocket_flow_places_loss_cut_after_fill() -> None:
 
     pipeline.run_once(state)
     broker_client.filled = True
-    order_handler.refresh()
 
     pipeline.run_once(state)
 

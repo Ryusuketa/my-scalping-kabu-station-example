@@ -1,4 +1,4 @@
-"""XGBoost trainer placeholder."""
+"""XGBoost classifier trainer."""
 
 from __future__ import annotations
 
@@ -16,7 +16,9 @@ from my_scalping_kabu_station_example.infrastructure.ml.xgb_predictor import Xgb
 
 @dataclass
 class XgbTrainer:
-    params: dict = field(default_factory=lambda: {"n_estimators": 50, "max_depth": 3, "learning_rate": 0.1})
+    params: dict = field(
+        default_factory=lambda: {"n_estimators": 50, "max_depth": 3, "learning_rate": 0.1, "objective": "binary:logistic"}
+    )
     default_score: float = 0.0
 
     def train(self, spec: FeatureSpec, dataset: Iterable[FeatureVector]) -> XgbPredictor:
@@ -31,8 +33,12 @@ class XgbTrainer:
             return XgbPredictor(feature_order=feature_names, model=None, default_score=self.default_score)
 
         data = np.array([[row.get(name, 0.0) for name in feature_names] for row in rows], dtype=float)
-        target = np.array([float(label) for label in labels], dtype=float)
+        target_values = [int(label) for label in labels]
+        unique_labels = sorted(set(target_values))
+        if len(unique_labels) == 1:
+            return XgbPredictor(feature_order=feature_names, model=None, default_score=float(unique_labels[0]))
+        target = np.array(target_values, dtype=int)
 
-        model = xgb.XGBRegressor(**self.params)
+        model = xgb.XGBClassifier(**self.params)
         model.fit(data, target)
         return XgbPredictor(feature_order=feature_names, model=model)

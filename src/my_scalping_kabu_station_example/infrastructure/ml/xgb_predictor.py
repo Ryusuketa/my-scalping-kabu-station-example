@@ -1,4 +1,4 @@
-"""XGBoost predictor placeholder."""
+"""XGBoost predictor."""
 
 from __future__ import annotations
 
@@ -22,5 +22,9 @@ class XgbPredictor:
 
         order = list(self.feature_order)
         data = np.array([[features.get(name, 0.0) for name in order]], dtype=float)
-        score = float(self.model.predict(data)[0])
+        if hasattr(self.model, "predict_proba"):
+            proba = self.model.predict_proba(data)
+            score = float(proba[0][1])
+        else:
+            score = float(self.model.predict(data)[0])
         return InferenceResult(features=features, score=score)
