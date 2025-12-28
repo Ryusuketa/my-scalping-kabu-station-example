@@ -1,5 +1,9 @@
 # my-scalping-kabu-station-example
 
+kabu-stationを使ったスキャルピング自動売買を行うコードです。
+実行は自己責任でお願いします。
+知識のある人のみ利用できるように設定方法は一切書きません
+
 ## Environment variables
 
 - `HISTORY_PATH` (optional): History directory or base CSV path, default `data/history`
