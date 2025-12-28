@@ -75,13 +75,14 @@ class DecisionPolicy:
         if context.open_order_price is None or context.open_order_side is None or context.open_order_qty is None:
             return None
 
+        pip_size = context.pip_size if context.pip_size > 0 else 1.0
         if context.open_order_side is OrderSide.BUY:
-            loss_pips = context.open_order_price - context.price
-            gain_pips = context.price - context.open_order_price
+            loss_pips = (context.open_order_price - context.price) / pip_size
+            gain_pips = (context.price - context.open_order_price) / pip_size
             repay_side = OrderSide.SELL
         else:
-            loss_pips = context.price - context.open_order_price
-            gain_pips = context.open_order_price - context.price
+            loss_pips = (context.price - context.open_order_price) / pip_size
+            gain_pips = (context.open_order_price - context.price) / pip_size
             repay_side = OrderSide.BUY
 
         loss_triggered = risk.loss_cut_pips > 0 and loss_pips >= risk.loss_cut_pips

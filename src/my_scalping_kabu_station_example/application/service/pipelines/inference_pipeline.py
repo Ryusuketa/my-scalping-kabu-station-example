@@ -73,11 +73,20 @@ class InferencePipeline:
             orders = list(self.order_state.list())
             open_order = orders[0] if orders else None
 
+        best_bid = snapshot.best_bid_price
+        best_ask = snapshot.best_ask_price
+        pip_size = 1.0
+        if best_bid is not None and best_ask is not None:
+            spread = float(best_ask) - float(best_bid)
+            if spread > 0:
+                pip_size = spread
+
         context = DecisionContext(
             position_size=self.position_port.current_position(),
             risk_budget=self.risk_params.max_position,
             symbol=snapshot.symbol,
             price=float(snapshot.mid or 0.0),
+            pip_size=pip_size,
             has_open_order=open_order is not None,
             open_order_side=open_order.side if open_order else None,
             open_order_price=open_order.price if open_order else None,

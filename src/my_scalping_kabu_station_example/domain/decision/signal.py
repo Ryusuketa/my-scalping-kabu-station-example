@@ -43,6 +43,7 @@ class DecisionContext:
     risk_budget: float
     symbol: Symbol
     price: float
+    pip_size: float
     has_open_order: bool = False
     open_order_side: OrderSide | None = None
     open_order_price: float | None = None

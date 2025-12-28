@@ -181,6 +181,7 @@ def test_inference_pipeline_runs_full_flow() -> None:
     assert feature_engine.calls[0] == (None, snapshot)
     assert predictor.features[0] == {"x": 42.0}
     assert decision_policy.called_with[0][1].position_size == 0.5
+    assert decision_policy.called_with[0][1].pip_size == 0.5
     assert order_port.intents == [intent]
     assert state.prev_snapshot == snapshot
     assert state.feature_state.last_ts == snapshot.ts
