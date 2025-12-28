@@ -8,6 +8,7 @@ from my_scalping_kabu_station_example.domain.decision.signal import OrderSide, T
 from my_scalping_kabu_station_example.domain.instruments.instrument import Instrument
 from my_scalping_kabu_station_example.domain.instruments.registry import InstrumentList
 from my_scalping_kabu_station_example.domain.market.types import Symbol
+from my_scalping_kabu_station_example.domain.order.realtime_order import RealTimeOrder
 
 
 class OrderPort(Protocol):
@@ -17,6 +18,14 @@ class OrderPort(Protocol):
 
 class PositionPort(Protocol):
     def current_position(self) -> float:
+        ...
+
+
+class OrderStatePort(Protocol):
+    def add(self, order: RealTimeOrder) -> None:
+        ...
+
+    def list(self) -> Iterable[RealTimeOrder]:
         ...
 
 

@@ -38,6 +38,7 @@ from my_scalping_kabu_station_example.domain.market.types import Quantity, Side,
 from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
 from my_scalping_kabu_station_example.infrastructure.memory.ring_buffer import InMemoryMarketBuffer
 from my_scalping_kabu_station_example.infrastructure.api.broker_client import BrokerClient, KabuOrderPort
+from my_scalping_kabu_station_example.infrastructure.memory.order_store import InMemoryOrderStore
 from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
 from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import ModelStoreFs
 from my_scalping_kabu_station_example.infrastructure.websocket.client import WebSocketClient
@@ -225,12 +226,14 @@ def main() -> None:
             "ExpireDay": int(os.getenv("ORDER_EXPIRE_DAY", "0")),
             "FrontOrderType": int(os.getenv("ORDER_FRONT_ORDER_TYPE", "10")),
         }
+        order_store = InMemoryOrderStore()
         broker_client = BrokerClient(base_url=api_base_url)
         order_port = KabuOrderPort(
             client=broker_client,
             api_key=api_token,
             base_payload=order_payload,
             side_override=side_override,
+            order_store=order_store,
         )
     else:
         order_port = LoggingOrderPort()

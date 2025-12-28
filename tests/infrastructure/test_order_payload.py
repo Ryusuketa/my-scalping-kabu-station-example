@@ -25,6 +25,8 @@ def test_to_order_payload_includes_intent_fields() -> None:
 
     payload = to_order_payload(intent)
 
+    assert payload["Symbol"] == Symbol("1234")
+    assert payload["Price"] == 0
     assert payload["Side"] == "2"
     assert payload["Qty"] == 500
 
@@ -49,6 +51,8 @@ def test_build_order_payload_applies_side_override() -> None:
 
     payload = build_order_payload(intent, side_override=OrderSide.BUY)
 
+    assert payload["Symbol"] == Symbol("1234")
+    assert payload["Price"] == 0
     assert payload["Side"] == "2"
 
 

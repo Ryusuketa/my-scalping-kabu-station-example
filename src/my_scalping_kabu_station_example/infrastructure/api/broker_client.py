@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any, Mapping, TYPE_CHECKING
 
 import requests
 
+if TYPE_CHECKING:
+    from my_scalping_kabu_station_example.application.ports.broker import OrderStatePort
+    from my_scalping_kabu_station_example.domain.decision.signal import OrderSide
 
 @dataclass
 class BrokerClient:
@@ -31,11 +34,25 @@ class KabuOrderPort:
     api_key: str
     base_payload: Mapping[str, Any]
     side_override: "OrderSide | None" = None
+    order_store: "OrderStatePort | None" = None
 
     def place_order(self, intent) -> str:
-        from my_scalping_kabu_station_example.domain.decision.signal import OrderSide
         from my_scalping_kabu_station_example.infrastructure.api.mapper import build_order_payload
 
         payload = build_order_payload(intent, base_payload=self.base_payload, side_override=self.side_override)
         response = self.client.place_order(payload, api_key=self.api_key)
-        return str(response.get("OrderId") or intent.intent_id)
+        order_id = str(response.get("OrderId") or intent.intent_id)
+        if self.order_store is not None:
+            from my_scalping_kabu_station_example.domain.order.realtime_order import RealTimeOrder
+
+            cash_margin = int(payload["CashMargin"])
+            qty = int(payload["Qty"])
+            order = RealTimeOrder(
+                symbol=intent.symbol,
+                qty=qty,
+                side=side_override or intent.side,
+                cash_margin=cash_margin,
+                order_id=order_id,
+            )
+            self.order_store.add(order)
+        return order_id
