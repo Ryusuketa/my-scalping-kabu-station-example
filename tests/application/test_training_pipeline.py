@@ -18,8 +18,13 @@ class DummyHistoryStore:
 
 
 class DummyFeatureEngine:
-    def compute_batch(self, *_args, **_kwargs):  # pragma: no cover - unused
-        return []
+    def __init__(self) -> None:
+        self.calls: list[tuple[FeatureSpec, Iterable[OrderBookSnapshot]]] = []
+        self.return_value = [{"x": 1.0}, {"x": 2.0}]
+
+    def compute_batch(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]):  # pragma: no cover - unused
+        self.calls.append((spec, snapshots))
+        return self.return_value
 
 
 class DummyPredictor:
@@ -32,11 +37,11 @@ class DummyPredictor:
 
 class DummyTrainer:
     def __init__(self) -> None:
-        self.calls: list[tuple[FeatureSpec, Iterable[OrderBookSnapshot]]] = []
+        self.calls: list[tuple[FeatureSpec, Iterable[dict[str, float]]]] = []
         self.predictor = DummyPredictor()
 
-    def train(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]):
-        self.calls.append((spec, snapshots))
+    def train(self, spec: FeatureSpec, dataset: Iterable[dict[str, float]]):
+        self.calls.append((spec, dataset))
         return self.predictor
 
 
@@ -71,6 +76,7 @@ def test_training_pipeline_trains_and_activates_model() -> None:
 
     pipeline.run(spec, snapshots)
 
-    assert trainer.calls[0] == (spec, snapshots)
+    assert feature_engine.calls[0] == (spec, snapshots)
+    assert list(trainer.calls[0][1]) == feature_engine.return_value
     assert model_store.saved == [trainer.predictor]
     assert model_store.swapped == [trainer.predictor]

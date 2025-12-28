@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from my_scalping_kabu_station_example.infrastructure.main.di import build_container
 
-def main():
-    raise NotImplementedError
+
+def main() -> dict:
+    return build_container()
 
 
 if __name__ == "__main__":

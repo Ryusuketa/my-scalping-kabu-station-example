@@ -27,6 +27,7 @@ class TrainingPipeline:
     def run(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]) -> None:
         """Train a model from snapshots and activate the resulting predictor."""
 
-        predictor = self.trainer.train(spec, snapshots)
+        dataset = self.feature_engine.compute_batch(spec, snapshots)
+        predictor = self.trainer.train(spec, dataset)
         self.model_store.save_candidate(predictor)
         self.model_store.swap_active(predictor)

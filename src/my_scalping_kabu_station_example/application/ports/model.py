@@ -7,6 +7,7 @@ from typing import Any, Iterable, Protocol
 from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
 from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
 from my_scalping_kabu_station_example.domain.decision.signal import InferenceResult
+from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureVector
 
 
 class ModelPredictorPort(Protocol):
@@ -15,7 +16,7 @@ class ModelPredictorPort(Protocol):
 
 
 class ModelTrainerPort(Protocol):
-    def train(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]) -> Any:
+    def train(self, spec: FeatureSpec, dataset: Iterable[FeatureVector]) -> Any:
         ...
 
 
