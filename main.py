@@ -5,6 +5,8 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Iterable, List
 
+import requests
+
 from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureVector
 from my_scalping_kabu_station_example.application.service.pipelines.inference_pipeline import InferencePipeline
 from my_scalping_kabu_station_example.application.service.state.stream_state import StreamState
@@ -113,6 +115,23 @@ class FixedPositionPort:
         return self._position
 
 
+def _fetch_api_token(base_url: str, api_password: str) -> str:
+    response = requests.post(
+        f"{base_url}/token",
+        json={"APIPassword": api_password},
+        timeout=5.0,
+    )
+    response.raise_for_status()
+    payload = response.json()
+    result_code = payload.get("ResultCode")
+    if result_code not in (None, 0):
+        raise RuntimeError(f"Token request failed with code {result_code}")
+    token = payload.get("Token")
+    if not token:
+        raise RuntimeError("Token not present in response")
+    return str(token)
+
+
 def _build_feature_spec() -> FeatureSpec:
     eps = 1e-9
     depth_bid = DepthQtySum(Side.BID, depth=5)
@@ -158,6 +177,15 @@ def _mock_snapshots(count: int) -> List[OrderBookSnapshot]:
 
 
 def main() -> None:
+    api_base_url = os.getenv("KABU_API_BASE_URL", "http://localhost:18080/kabusapi")
+    skip_auth = os.getenv("SKIP_KABU_AUTH", "").lower() in {"1", "true", "yes"}
+    if not skip_auth:
+        api_password = os.getenv("KABU_API_PASSWORD")
+        if not api_password:
+            raise RuntimeError("KABU_API_PASSWORD is required to fetch API token")
+        token = _fetch_api_token(api_base_url, api_password)
+        os.environ["KABU_API_TOKEN"] = token
+
     ws_url = os.getenv("WEBSOCKET_URL")
     max_iterations = int(os.getenv("MAX_ITERATIONS", "5"))
 
