@@ -28,6 +28,12 @@ class OrderStatePort(Protocol):
     def list(self) -> Iterable[RealTimeOrder]:
         ...
 
+    def mark_filled(self, order_id: str) -> bool:
+        ...
+
+    def remove(self, order_id: str) -> bool:
+        ...
+
 
 class InstrumentPort(Protocol):
     def list(self) -> InstrumentList:

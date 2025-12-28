@@ -27,6 +27,18 @@ class BrokerClient:
         response.raise_for_status()
         return response.json()
 
+    def list_orders(self, api_key: str, order_id: str) -> list[Mapping[str, Any]]:
+        params = {"id": order_id}
+        headers = {"X-API-KEY": api_key}
+        response = requests.get(
+            f"{self.base_url}/orders",
+            params=params,
+            headers=headers,
+            timeout=self.timeout_seconds,
+        )
+        response.raise_for_status()
+        return list(response.json())
+
 
 @dataclass
 class KabuOrderPort:

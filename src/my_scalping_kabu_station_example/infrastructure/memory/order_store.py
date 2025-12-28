@@ -18,3 +18,17 @@ class InMemoryOrderStore(OrderStatePort):
 
     def list(self) -> List[RealTimeOrder]:
         return list(self.orders)
+
+    def mark_filled(self, order_id: str) -> bool:
+        for order in self.orders:
+            if order.order_id == order_id:
+                order.is_filled = True
+                return True
+        return False
+
+    def remove(self, order_id: str) -> bool:
+        for idx, order in enumerate(self.orders):
+            if order.order_id == order_id:
+                self.orders.pop(idx)
+                return True
+        return False
