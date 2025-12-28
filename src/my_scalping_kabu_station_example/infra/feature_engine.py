@@ -6,7 +6,7 @@ import pandas as pd
 from math import exp
 from typing import Dict, Iterable
 
-from ..domain.features.expr import (
+from my_scalping_kabu_station_example.domain.features.expr import (
     AddSum,
     BestAskPrice,
     BestAskQty,
@@ -21,12 +21,12 @@ from ..domain.features.expr import (
     Mid,
     TimeDecayEma,
 )
-from ..domain.features.spec import FeatureSpec
-from ..domain.features.state import FeatureState
-from ..domain.order_book import OrderBookSnapshot
-from ..domain.ports import FeatureEnginePort
-from ..domain.types import PriceQtyMap, Side, to_price_key
-from ..domain.order_book import Level
+from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
+from my_scalping_kabu_station_example.domain.features.state import FeatureState
+from my_scalping_kabu_station_example.domain.order_book import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.ports import FeatureEnginePort
+from my_scalping_kabu_station_example.domain.types import PriceQtyMap, Side, to_price_key
+from my_scalping_kabu_station_example.domain.order_book import Level
 
 
 class PandasOrderBookFeatureEngine(FeatureEnginePort):

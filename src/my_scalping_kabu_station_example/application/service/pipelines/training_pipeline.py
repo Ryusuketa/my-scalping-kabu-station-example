@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from ...ports.feature_engine import FeatureEnginePort
-from ...ports.history import HistoryStorePort
-from ...ports.model import ModelStorePort, ModelTrainerPort
-from ....domain.features.spec import FeatureSpec
-from ....domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureEnginePort
+from my_scalping_kabu_station_example.application.ports.history import HistoryStorePort
+from my_scalping_kabu_station_example.application.ports.model import ModelStorePort, ModelTrainerPort
+from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
 
 
 class TrainingPipeline:
@@ -25,4 +25,8 @@ class TrainingPipeline:
         self.model_store = model_store
 
     def run(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]) -> None:
-        raise NotImplementedError
+        """Train a model from snapshots and activate the resulting predictor."""
+
+        predictor = self.trainer.train(spec, snapshots)
+        self.model_store.save_candidate(predictor)
+        self.model_store.swap_active(predictor)

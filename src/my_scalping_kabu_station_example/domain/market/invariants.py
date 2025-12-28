@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from .level import Level
-from .types import Side
+from my_scalping_kabu_station_example.domain.market.level import Level
+from my_scalping_kabu_station_example.domain.market.types import Side
 
 
 def is_sorted_bids(levels: Iterable[Level]) -> bool:

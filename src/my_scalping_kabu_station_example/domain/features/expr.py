@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-from ..market.types import Side
+from my_scalping_kabu_station_example.domain.market.types import Side
 
 
 class Expr(Protocol):

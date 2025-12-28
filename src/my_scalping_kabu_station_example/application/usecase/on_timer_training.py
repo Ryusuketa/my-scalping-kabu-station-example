@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from ..service.pipelines.training_pipeline import TrainingPipeline
-from ...domain.features.spec import FeatureSpec
-from ...domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.application.service.pipelines.training_pipeline import TrainingPipeline
+from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
 
 
 class OnTimerTrainingUseCase:

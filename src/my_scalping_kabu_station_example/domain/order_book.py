@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Iterable, List, Optional, Sequence, Tuple
 
-from .types import PriceKey, PriceQtyMap, Side, to_price_key
+from my_scalping_kabu_station_example.domain.types import PriceKey, PriceQtyMap, Side, to_price_key
 
 
 @dataclass(frozen=True)

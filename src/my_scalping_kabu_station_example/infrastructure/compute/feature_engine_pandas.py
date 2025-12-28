@@ -6,9 +6,9 @@ from dataclasses import replace
 from decimal import Decimal
 from typing import Dict, Iterable, List, Tuple
 
-from ...application.ports.feature_engine import FeatureEnginePort, FeatureTable, FeatureVector
-from ...application.service.state.feature_state import FeatureState
-from ...domain.features.expr import (
+from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureEnginePort, FeatureTable, FeatureVector
+from my_scalping_kabu_station_example.application.service.state.feature_state import FeatureState
+from my_scalping_kabu_station_example.domain.features.expr import (
     Add,
     BestAskPrice,
     BestAskQty,
@@ -28,10 +28,10 @@ from ...domain.features.expr import (
     Sub,
     TimeDecayEma,
 )
-from ...domain.features.spec import FeatureDef, FeatureSpec
-from ...domain.market.orderbook_snapshot import OrderBookSnapshot
-from ...domain.market.time import TimeDecay
-from ...domain.market.types import PriceKey, Quantity, Side
+from my_scalping_kabu_station_example.domain.features.spec import FeatureDef, FeatureSpec
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.market.time import TimeDecay
+from my_scalping_kabu_station_example.domain.market.types import PriceKey, Quantity, Side
 
 
 def _qty_to_float(qty: Quantity | None) -> float:

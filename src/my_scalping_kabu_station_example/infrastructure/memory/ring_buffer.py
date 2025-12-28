@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections import deque
 from typing import Iterable, Optional
 
-from ...application.ports.buffer import MarketBufferPort
-from ...domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.application.ports.buffer import MarketBufferPort
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
 
 
 class RingBuffer:

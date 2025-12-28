@@ -6,8 +6,8 @@ import csv
 from pathlib import Path
 from typing import Dict
 
-from ..domain.order_book import OrderBookSnapshot
-from ..domain.ports import HistoryStore, SnapshotBuffer
+from my_scalping_kabu_station_example.domain.order_book import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.ports import HistoryStore, SnapshotBuffer
 
 
 class CsvHistoryStore(HistoryStore):

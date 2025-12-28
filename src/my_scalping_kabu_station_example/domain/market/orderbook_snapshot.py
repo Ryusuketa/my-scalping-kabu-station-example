@@ -6,10 +6,10 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import List, Optional
 
-from .invariants import is_sorted_asks, is_sorted_bids
-from .level import Level
-from .time import Timestamp
-from .types import PriceKey, PriceQtyMap, Quantity, Side, Symbol
+from my_scalping_kabu_station_example.domain.market.invariants import is_sorted_asks, is_sorted_bids
+from my_scalping_kabu_station_example.domain.market.level import Level
+from my_scalping_kabu_station_example.domain.market.time import Timestamp
+from my_scalping_kabu_station_example.domain.market.types import PriceKey, PriceQtyMap, Quantity, Side, Symbol
 
 
 @dataclass(slots=True)

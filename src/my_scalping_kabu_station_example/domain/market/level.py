@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .types import PriceKey, Quantity
+from my_scalping_kabu_station_example.domain.market.types import PriceKey, Quantity
 
 
 @dataclass(frozen=True)

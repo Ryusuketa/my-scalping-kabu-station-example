@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
-from ..market.types import Symbol
+from my_scalping_kabu_station_example.domain.market.types import Symbol
 
 
 @dataclass(frozen=True)
