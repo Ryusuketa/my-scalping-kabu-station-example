@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..service.pipelines.instrument_sync import InstrumentSync
+from my_scalping_kabu_station_example.application.service.pipelines.instrument_sync import InstrumentSync
 
 
 class OnStartupUseCase:

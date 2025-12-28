@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from ...ports.broker import InstrumentPort
-from ....domain.instruments.registry import InstrumentList
+from my_scalping_kabu_station_example.application.ports.broker import InstrumentPort
+from my_scalping_kabu_station_example.domain.instruments.registry import InstrumentList
 
 
 class InstrumentSync:
@@ -11,4 +11,9 @@ class InstrumentSync:
         self.instrument_port = instrument_port
 
     def run(self) -> InstrumentList:
-        raise NotImplementedError
+        """Fetch instruments from broker and return a validated registry."""
+
+        instruments = self.instrument_port.list()
+        if not instruments.instruments:
+            raise ValueError("No instruments available from broker")
+        return instruments

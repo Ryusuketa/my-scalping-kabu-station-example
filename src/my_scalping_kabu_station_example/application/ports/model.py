@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Any, Iterable, Protocol
 
-from ...domain.features.spec import FeatureSpec
-from ...domain.market.orderbook_snapshot import OrderBookSnapshot
-from ...domain.decision.signal import InferenceResult
+from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.decision.signal import InferenceResult
 
 
 class ModelPredictorPort(Protocol):

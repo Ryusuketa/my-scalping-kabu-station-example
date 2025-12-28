@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional
 
-from ..market.types import Symbol
-from .instrument import Instrument
+from my_scalping_kabu_station_example.domain.market.types import Symbol
+from my_scalping_kabu_station_example.domain.instruments.instrument import Instrument
 
 
 @dataclass

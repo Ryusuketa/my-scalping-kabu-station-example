@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Iterable, Protocol
 
-from ...domain.decision.signal import OrderSide, TradeIntent
-from ...domain.instruments.instrument import Instrument
-from ...domain.instruments.registry import InstrumentList
-from ...domain.market.types import Symbol
+from my_scalping_kabu_station_example.domain.decision.signal import OrderSide, TradeIntent
+from my_scalping_kabu_station_example.domain.instruments.instrument import Instrument
+from my_scalping_kabu_station_example.domain.instruments.registry import InstrumentList
+from my_scalping_kabu_station_example.domain.market.types import Symbol
 
 
 class OrderPort(Protocol):

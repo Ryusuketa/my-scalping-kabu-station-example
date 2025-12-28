@@ -39,4 +39,11 @@ def price_key_from(value: float | int | str | Decimal) -> PriceKey:
     Domain mandates avoiding floating point drift by storing prices as Decimal.
     """
 
-    return PriceKey(Decimal(value))
+    if isinstance(value, Decimal):
+        return PriceKey(value)
+    if isinstance(value, (int, str)):
+        return PriceKey(Decimal(str(value)))
+    if isinstance(value, float):
+        # Convert via string to avoid binary floating point artifacts.
+        return PriceKey(Decimal(str(value)))
+    raise TypeError(f"Unsupported type for PriceKey: {type(value)}")

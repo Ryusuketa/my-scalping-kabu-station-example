@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Optional
 
-from ..order_book import Level
-from ..types import PriceKey
+from my_scalping_kabu_station_example.domain.order_book import Level
+from my_scalping_kabu_station_example.domain.types import PriceKey
 
 
 @dataclass(frozen=True)

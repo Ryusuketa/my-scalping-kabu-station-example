@@ -6,9 +6,9 @@ from typing import Protocol, Tuple
 
 import pandas as pd
 
-from .features.spec import FeatureSpec
-from .features.state import FeatureState
-from .order_book import OrderBookSnapshot
+from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
+from my_scalping_kabu_station_example.domain.features.state import FeatureState
+from my_scalping_kabu_station_example.domain.order_book import OrderBookSnapshot
 
 
 class FeatureEnginePort(Protocol):

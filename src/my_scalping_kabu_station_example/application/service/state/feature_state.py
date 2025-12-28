@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Optional
 
-from ....domain.market.time import Timestamp
+from my_scalping_kabu_station_example.domain.market.time import Timestamp
 
 
 @dataclass

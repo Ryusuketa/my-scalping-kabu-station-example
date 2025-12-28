@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from ..ports.feature_engine import FeatureEnginePort
-from ..ports.history import HistoryStorePort
-from ...domain.features.spec import FeatureSpec
-from ...domain.market.orderbook_snapshot import OrderBookSnapshot
+from my_scalping_kabu_station_example.application.ports.feature_engine import FeatureEnginePort
+from my_scalping_kabu_station_example.application.ports.history import HistoryStorePort
+from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
+from my_scalping_kabu_station_example.domain.market.orderbook_snapshot import OrderBookSnapshot
 
 
 class DatasetBuilder:
@@ -16,4 +16,6 @@ class DatasetBuilder:
         self.feature_engine = feature_engine
 
     def build(self, spec: FeatureSpec, snapshots: Iterable[OrderBookSnapshot]):
-        raise NotImplementedError
+        """Compute feature vectors for the provided snapshots."""
+
+        return list(self.feature_engine.compute_batch(spec, snapshots))

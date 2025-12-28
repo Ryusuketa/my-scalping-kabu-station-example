@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Mapping, Optional
 
-from .expr import Expr
+from my_scalping_kabu_station_example.domain.features.expr import Expr
 
 
 @dataclass(frozen=True)

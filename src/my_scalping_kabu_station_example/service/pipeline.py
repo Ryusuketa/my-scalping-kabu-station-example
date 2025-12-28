@@ -5,10 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, Optional, Protocol
 
-from ..domain.features.spec import FeatureSpec
-from ..domain.features.state import FeatureState
-from ..domain.order_book import OrderBookSnapshot, OrderBookUpdate
-from ..domain.ports import FeatureEnginePort, HistoryStore, SnapshotBuffer
+from my_scalping_kabu_station_example.domain.features.spec import FeatureSpec
+from my_scalping_kabu_station_example.domain.features.state import FeatureState
+from my_scalping_kabu_station_example.domain.order_book import OrderBookSnapshot, OrderBookUpdate
+from my_scalping_kabu_station_example.domain.ports import FeatureEnginePort, HistoryStore, SnapshotBuffer
 
 
 class ModelPredictor(Protocol):
