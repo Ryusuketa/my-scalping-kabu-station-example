@@ -80,7 +80,7 @@ def load_settings(data: Mapping[str, Any] | None = None) -> Settings:
 
     history_path_value = config.get("history_path") or os.environ.get("HISTORY_PATH") or "data/history"
     history_path = Path(history_path_value)
-    ws_url = config.get("ws_url") or os.environ.get("WS_URL")
+    ws_url = config.get("ws_url") or os.environ.get("WS_URL") or "ws://localhost:18081"
     ws_api_key = config.get("ws_api_key") or os.environ.get("WS_API_KEY")
     return Settings(
         feature_spec=feature_spec,
