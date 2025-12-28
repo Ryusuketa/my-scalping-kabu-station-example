@@ -28,3 +28,22 @@ class FeatureEnginePort(Protocol):
         """Compute features for an entire dataframe of snapshots."""
         ...
 
+
+class HistoryStore(Protocol):
+    """Persists normalized snapshots for backtesting or training."""
+
+    def append(self, snapshot: OrderBookSnapshot) -> None:
+        """Append a single snapshot to the underlying store."""
+        ...
+
+
+class SnapshotBuffer(Protocol):
+    """In-memory buffer used to retrieve the previous snapshot."""
+
+    def previous(self) -> OrderBookSnapshot | None:
+        """Return the most recent snapshot stored in the buffer."""
+        ...
+
+    def update(self, snapshot: OrderBookSnapshot) -> OrderBookSnapshot | None:
+        """Store the snapshot and return the previously stored one (if any)."""
+        ...
