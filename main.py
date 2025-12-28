@@ -209,16 +209,12 @@ def main() -> None:
         api_token = os.getenv("KABU_API_TOKEN")
         if not api_token:
             raise RuntimeError("KABU_API_TOKEN is required when USE_API_ORDER is enabled")
-        order_symbol = os.getenv("ORDER_SYMBOL")
-        if not order_symbol:
-            raise RuntimeError("ORDER_SYMBOL is required when USE_API_ORDER is enabled")
         side_override_value = os.getenv("ORDER_SIDE_OVERRIDE", "").upper()
         side_override = None
         if side_override_value in {"BUY", "SELL"}:
             side_override = OrderSide[side_override_value]
 
         order_payload = {
-            "Symbol": order_symbol,
             "Exchange": int(os.getenv("ORDER_EXCHANGE", "9")),
             "SecurityType": int(os.getenv("ORDER_SECURITY_TYPE", "1")),
             "CashMargin": int(os.getenv("ORDER_CASH_MARGIN", "2")),

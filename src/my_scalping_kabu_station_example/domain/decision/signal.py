@@ -29,8 +29,8 @@ class TradeIntent:
     intent_id: str
     side: OrderSide
     quantity: float
-    symbol: Optional[Symbol] = None
-    price: Optional[float] = None
+    symbol: Symbol
+    price: float
     metadata: Optional[Dict[str, Any]] = None
 
 
@@ -40,3 +40,5 @@ class DecisionContext:
 
     position_size: float
     risk_budget: float
+    symbol: Symbol
+    price: float

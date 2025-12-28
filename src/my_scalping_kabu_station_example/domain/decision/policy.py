@@ -29,13 +29,25 @@ class DecisionPolicy:
             qty = self._buy_quantity(context.position_size, risk.max_position)
             if qty <= 0:
                 return None
-            return TradeIntent(intent_id=self._intent_id(), side=OrderSide.BUY, quantity=qty)
+            return TradeIntent(
+                intent_id=self._intent_id(),
+                side=OrderSide.BUY,
+                quantity=qty,
+                symbol=context.symbol,
+                price=context.price,
+            )
 
         if score < -self.score_threshold:
             qty = self._sell_quantity(context.position_size, risk.max_position)
             if qty <= 0:
                 return None
-            return TradeIntent(intent_id=self._intent_id(), side=OrderSide.SELL, quantity=qty)
+            return TradeIntent(
+                intent_id=self._intent_id(),
+                side=OrderSide.SELL,
+                quantity=qty,
+                symbol=context.symbol,
+                price=context.price,
+            )
 
         return None
 

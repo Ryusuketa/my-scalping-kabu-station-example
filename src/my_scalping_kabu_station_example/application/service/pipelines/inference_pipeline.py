@@ -69,6 +69,8 @@ class InferencePipeline:
         context = DecisionContext(
             position_size=self.position_port.current_position(),
             risk_budget=self.risk_params.max_position,
+            symbol=snapshot.symbol,
+            price=float(snapshot.mid or 0.0),
         )
         intent = self.decision_policy.decide(inference=inference, context=context, risk=self.risk_params)
         if intent is not None:

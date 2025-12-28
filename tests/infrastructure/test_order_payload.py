@@ -53,7 +53,7 @@ def test_build_order_payload_applies_side_override() -> None:
 
 
 def test_to_order_payload_requires_fields() -> None:
-    intent = TradeIntent(intent_id="abc", side=OrderSide.SELL, quantity=1.0, symbol=Symbol("1234"))
+    intent = TradeIntent(intent_id="abc", side=OrderSide.SELL, quantity=1.0, symbol=Symbol("1234"), price=0.0)
 
     with pytest.raises(ValueError):
         to_order_payload(intent)
