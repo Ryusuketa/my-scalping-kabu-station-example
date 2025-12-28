@@ -7,8 +7,8 @@ from typing import Any, Dict, Optional, Protocol
 
 from ..domain.features.spec import FeatureSpec
 from ..domain.features.state import FeatureState
-from ..domain.order_book import OrderBookSnapshot
-from ..domain.ports import FeatureEnginePort
+from ..domain.order_book import OrderBookSnapshot, OrderBookUpdate
+from ..domain.ports import FeatureEnginePort, HistoryStore, SnapshotBuffer
 
 
 class ModelPredictor(Protocol):
@@ -51,6 +51,26 @@ class FeatureNode:
             now_snapshot=now_snapshot,
             state=state,
         )
+
+
+@dataclass
+class NormalizeNode:
+    """Converts incoming DTOs into normalized snapshots."""
+
+    def normalize(self, update: OrderBookUpdate) -> OrderBookSnapshot:
+        return update.to_snapshot()
+
+
+@dataclass
+class PersistAndBufferNode:
+    """Persists snapshots and maintains the previous snapshot in memory."""
+
+    history_store: HistoryStore
+    buffer: SnapshotBuffer
+
+    def persist_and_buffer(self, snapshot: OrderBookSnapshot) -> OrderBookSnapshot | None:
+        self.history_store.append(snapshot)
+        return self.buffer.update(snapshot)
 
 
 @dataclass

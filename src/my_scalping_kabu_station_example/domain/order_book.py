@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, Sequence, Tuple
 
-from .types import PriceKey, PriceQtyMap, Side
+from .types import PriceKey, PriceQtyMap, Side, to_price_key
 
 
 @dataclass(frozen=True)
@@ -68,4 +68,25 @@ class OrderBookSnapshot:
             mid=mid_price,
             bid_map={level.price: level.quantity for level in bid_sorted},
             ask_map={level.price: level.quantity for level in ask_sorted},
+        )
+
+
+@dataclass(frozen=True)
+class OrderBookUpdate:
+    """Raw order book update DTO prior to normalization."""
+
+    ts: datetime
+    symbol: str
+    bids: Sequence[Tuple[PriceKey | float | int | str, float]]
+    asks: Sequence[Tuple[PriceKey | float | int | str, float]]
+
+    def to_snapshot(self) -> OrderBookSnapshot:
+        """Normalize the raw update into an OrderBookSnapshot."""
+        bid_levels = [Level(price=to_price_key(price), quantity=qty) for price, qty in self.bids]
+        ask_levels = [Level(price=to_price_key(price), quantity=qty) for price, qty in self.asks]
+        return OrderBookSnapshot.from_levels(
+            ts=self.ts,
+            symbol=self.symbol,
+            bid_levels=bid_levels,
+            ask_levels=ask_levels,
         )
