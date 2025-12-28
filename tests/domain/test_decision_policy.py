@@ -99,3 +99,4 @@ def test_decision_policy_triggers_take_profit() -> None:
     assert intent.cash_margin == 3
     assert intent.side is OrderSide.SELL
     assert intent.quantity == 1.0
+    assert intent.price == 0.0

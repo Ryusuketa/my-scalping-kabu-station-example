@@ -90,8 +90,8 @@ class DecisionPolicy:
             return None
 
         quantity_units = context.open_order_qty / 100.0
-        metadata = {"FrontOrderType": 10} if loss_triggered else None
-        price = 0.0 if loss_triggered else context.price
+        metadata = {"FrontOrderType": 10} if (loss_triggered or gain_triggered) else None
+        price = 0.0 if (loss_triggered or gain_triggered) else context.price
         return TradeIntent(
             intent_id=self._intent_id(),
             side=repay_side,
