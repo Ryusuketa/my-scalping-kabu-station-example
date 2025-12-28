@@ -48,6 +48,15 @@ class InferencePipeline:
         self.history_store.append(snapshot)
         self.buffer.update(snapshot)
 
+        try:
+            predictor = self.model_store.load_active()
+        except FileNotFoundError:
+            state.prev_snapshot = snapshot
+            return
+        if predictor is None:
+            state.prev_snapshot = snapshot
+            return
+
         features, feature_state = self.feature_engine.compute_one(
             spec=self.feature_spec,
             prev_snapshot=prev_snapshot,
@@ -55,7 +64,6 @@ class InferencePipeline:
             state=state.feature_state,
         )
 
-        predictor = self.model_store.load_active()
         inference = predictor.predict(features)
 
         context = DecisionContext(

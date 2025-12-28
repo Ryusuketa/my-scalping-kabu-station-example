@@ -96,6 +96,21 @@ class DummyModelStore:
         return None
 
 
+class MissingModelStore:
+    def __init__(self) -> None:
+        self.loaded = 0
+
+    def load_active(self):
+        self.loaded += 1
+        raise FileNotFoundError
+
+    def save_candidate(self, *_args, **_kwargs):  # pragma: no cover - not used
+        return None
+
+    def swap_active(self, *_args, **_kwargs):  # pragma: no cover - not used
+        return None
+
+
 class DummyOrderPort:
     def __init__(self) -> None:
         self.intents: list[TradeIntent] = []
@@ -195,3 +210,38 @@ def test_inference_pipeline_skips_order_when_policy_returns_none() -> None:
     pipeline.run_once(state)
 
     assert order_port.intents == []
+
+
+def test_inference_pipeline_skips_inference_when_model_missing() -> None:
+    ts = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    snapshot = _make_snapshot(ts)
+    market_data = DummyMarketData(snapshot)
+    history_store = DummyHistoryStore()
+    buffer = InMemoryMarketBuffer()
+    feature_engine = DummyFeatureEngine()
+    model_store = MissingModelStore()
+    order_port = DummyOrderPort()
+    position_port = DummyPositionPort(position=0.0)
+    decision_policy = DummyDecisionPolicy(intent=None)
+    feature_spec = FeatureSpec(version="v1", eps=1e-9, params={}, features=[FeatureDef(name="x", expr=Const(1.0))])
+    risk_params = RiskParams(max_position=1.0, stop_loss=1.0, take_profit=1.0)
+    pipeline = InferencePipeline(
+        market_data=market_data,
+        history_store=history_store,
+        buffer=buffer,
+        feature_engine=feature_engine,
+        model_store=model_store,
+        order_port=order_port,
+        position_port=position_port,
+        feature_spec=feature_spec,
+        decision_policy=decision_policy,
+        risk_params=risk_params,
+    )
+    state = StreamState()
+
+    pipeline.run_once(state)
+
+    assert history_store.appended == [snapshot]
+    assert feature_engine.calls == []
+    assert order_port.intents == []
+    assert state.prev_snapshot == snapshot
