@@ -37,6 +37,7 @@ from my_scalping_kabu_station_example.domain.market.time import Timestamp
 from my_scalping_kabu_station_example.domain.market.types import Quantity, Side, Symbol, price_key_from
 from my_scalping_kabu_station_example.infrastructure.compute.feature_engine_pandas import PandasOrderBookFeatureEngine
 from my_scalping_kabu_station_example.infrastructure.memory.ring_buffer import InMemoryMarketBuffer
+from my_scalping_kabu_station_example.infrastructure.api.broker_client import BrokerClient, KabuOrderPort
 from my_scalping_kabu_station_example.infrastructure.persistence.csv_history_store import CsvHistoryStore
 from my_scalping_kabu_station_example.infrastructure.persistence.model_store_fs import ModelStoreFs
 from my_scalping_kabu_station_example.infrastructure.websocket.client import WebSocketClient
@@ -203,7 +204,40 @@ def main() -> None:
         model_store = InMemoryModelStore()
     else:
         model_store = ModelStoreFs(base_dir=os.getenv("MODEL_DIR", "models"))
-    order_port = LoggingOrderPort()
+    use_api_order = os.getenv("USE_API_ORDER", "").lower() in {"1", "true", "yes"}
+    if use_api_order:
+        api_token = os.getenv("KABU_API_TOKEN")
+        if not api_token:
+            raise RuntimeError("KABU_API_TOKEN is required when USE_API_ORDER is enabled")
+        order_symbol = os.getenv("ORDER_SYMBOL")
+        if not order_symbol:
+            raise RuntimeError("ORDER_SYMBOL is required when USE_API_ORDER is enabled")
+        side_override_value = os.getenv("ORDER_SIDE_OVERRIDE", "").upper()
+        side_override = None
+        if side_override_value in {"BUY", "SELL"}:
+            side_override = OrderSide[side_override_value]
+
+        order_payload = {
+            "Symbol": order_symbol,
+            "Exchange": int(os.getenv("ORDER_EXCHANGE", "9")),
+            "SecurityType": int(os.getenv("ORDER_SECURITY_TYPE", "1")),
+            "CashMargin": int(os.getenv("ORDER_CASH_MARGIN", "2")),
+            "MarginTradeType": int(os.getenv("ORDER_MARGIN_TRADE_TYPE", "3")),
+            "DelivType": int(os.getenv("ORDER_DELIV_TYPE", "0")),
+            "AccountType": int(os.getenv("ORDER_ACCOUNT_TYPE", "2")),
+            "Price": int(os.getenv("ORDER_PRICE", "0")),
+            "ExpireDay": int(os.getenv("ORDER_EXPIRE_DAY", "0")),
+            "FrontOrderType": int(os.getenv("ORDER_FRONT_ORDER_TYPE", "10")),
+        }
+        broker_client = BrokerClient(base_url=api_base_url)
+        order_port = KabuOrderPort(
+            client=broker_client,
+            api_key=api_token,
+            base_payload=order_payload,
+            side_override=side_override,
+        )
+    else:
+        order_port = LoggingOrderPort()
     position_port = FixedPositionPort()
     feature_spec = _build_feature_spec()
     decision_policy = DecisionPolicy(score_threshold=0.0, lot_size=1.0)

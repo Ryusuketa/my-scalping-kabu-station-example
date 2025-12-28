@@ -103,6 +103,8 @@ UV_CACHE_DIR/
 CACHEDIR.TAG
 interpreter-v4/
 sdists-v9/
+uv_cache/
+.kabu_station_api.yaml
 
 # poetry
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
