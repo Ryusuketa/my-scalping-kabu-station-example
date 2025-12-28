@@ -75,6 +75,7 @@ def test_decision_policy_triggers_loss_cut() -> None:
     assert intent.cash_margin == 3
     assert intent.side is OrderSide.SELL
     assert intent.quantity == 2.0
+    assert intent.price == 0.0
 
 
 def test_decision_policy_triggers_take_profit() -> None:
